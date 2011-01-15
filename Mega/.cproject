@@ -32,12 +32,18 @@
 <tool id="de.innot.avreclipse.tool.compiler.winavr.app.debug.510362082" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.app.debug">
 <option id="de.innot.avreclipse.compiler.option.debug.level.319331066" name="Generate Debugging Info" superClass="de.innot.avreclipse.compiler.option.debug.level" value="de.innot.avreclipse.compiler.option.debug.level.none" valueType="enumerated"/>
 <option id="de.innot.avreclipse.compiler.option.optimize.599934171" name="Optimization Level" superClass="de.innot.avreclipse.compiler.option.optimize" value="de.innot.avreclipse.compiler.optimize.size" valueType="enumerated"/>
+<option id="de.innot.avreclipse.compiler.option.incpath.41958825" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Mega/include}&quot;"/>
+</option>
 <inputType id="de.innot.avreclipse.compiler.winavr.input.1833657216" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.cppcompiler.app.debug.1265627258" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
 <option id="de.innot.avreclipse.cppcompiler.option.debug.level.359706738" name="Generate Debugging Info" superClass="de.innot.avreclipse.cppcompiler.option.debug.level" value="de.innot.avreclipse.cppcompiler.option.debug.level.none" valueType="enumerated"/>
 <option id="de.innot.avreclipse.cppcompiler.option.optimize.1313148744" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.size" valueType="enumerated"/>
 <option id="de.innot.avreclipse.cppcompiler.option.optimize.other.712032830" name="Other Optimization Flags" superClass="de.innot.avreclipse.cppcompiler.option.optimize.other" value="" valueType="string"/>
+<option id="de.innot.avreclipse.cppcompiler.option.incpath.255971908" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Mega/include}&quot;"/>
+</option>
 <inputType id="de.innot.avreclipse.cppcompiler.input.857264395" superClass="de.innot.avreclipse.cppcompiler.input"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.708098838" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
@@ -184,8 +190,8 @@
 <parser enabled="true"/>
 </scannerInfoProvider>
 </profile>
-<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1141332641;de.innot.avreclipse.configuration.app.debug.1141332641.;de.innot.avreclipse.tool.cppcompiler.app.debug.1265627258;de.innot.avreclipse.cppcompiler.input.857264395">
-<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileCPP"/>
+<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.release.1991431273;de.innot.avreclipse.configuration.app.release.1991431273.">
+<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
 <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 <buildOutputProvider>
 <openAction enabled="true" filePath=""/>
@@ -307,8 +313,8 @@
 </scannerInfoProvider>
 </profile>
 </scannerConfigBuildInfo>
-<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.release.1991431273;de.innot.avreclipse.configuration.app.release.1991431273.">
-<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
+<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1141332641;de.innot.avreclipse.configuration.app.debug.1141332641.;de.innot.avreclipse.tool.cppcompiler.app.debug.1265627258;de.innot.avreclipse.cppcompiler.input.857264395">
+<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileCPP"/>
 <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 <buildOutputProvider>
 <openAction enabled="true" filePath=""/>
@@ -1097,8 +1103,8 @@
 <parser enabled="true"/>
 </scannerInfoProvider>
 </profile>
-<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1141332641;de.innot.avreclipse.configuration.app.debug.1141332641.;de.innot.avreclipse.tool.cppcompiler.app.debug.1265627258;de.innot.avreclipse.cppcompiler.input.857264395">
-<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileCPP"/>
+<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.release.1991431273;de.innot.avreclipse.configuration.app.release.1991431273.">
+<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
 <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 <buildOutputProvider>
 <openAction enabled="true" filePath=""/>
@@ -1220,8 +1226,8 @@
 </scannerInfoProvider>
 </profile>
 </scannerConfigBuildInfo>
-<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.release.1991431273;de.innot.avreclipse.configuration.app.release.1991431273.">
-<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
+<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1141332641;de.innot.avreclipse.configuration.app.debug.1141332641.;de.innot.avreclipse.tool.cppcompiler.app.debug.1265627258;de.innot.avreclipse.cppcompiler.input.857264395">
+<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileCPP"/>
 <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 <buildOutputProvider>
 <openAction enabled="true" filePath=""/>

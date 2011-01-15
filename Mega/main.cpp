@@ -18,7 +18,12 @@ extern "C" void __cxa_pure_virtual()
 int main()
 {
     init();
-    for (;;)
-    {
-    }
+    pinMode(13,OUTPUT);
+    pinMode(12,OUTPUT);
+    pinMode(11,OUTPUT);
+    analogWrite(13,10);
+    digitalWrite(12,LOW);
+    digitalWrite(11,HIGH);
+    for (;;) {}
+    return 0;
 }
