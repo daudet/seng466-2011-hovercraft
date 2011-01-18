@@ -245,13 +245,13 @@ Disassembly of section .text:
      27a:	61 e0       	ldi	r22, 0x01	; 1
      27c:	0e 94 93 18 	call	0x3126	;  0x3126
      280:	8d e0       	ldi	r24, 0x0D	; 13
-     282:	6a e0       	ldi	r22, 0x0A	; 10
+     282:	68 e7       	ldi	r22, 0x78	; 120
      284:	70 e0       	ldi	r23, 0x00	; 0
      286:	0e 94 d7 17 	call	0x2fae	;  0x2fae
-     28a:	8c e0       	ldi	r24, 0x0C	; 12
+     28a:	8b e0       	ldi	r24, 0x0B	; 11
      28c:	60 e0       	ldi	r22, 0x00	; 0
      28e:	0e 94 b9 18 	call	0x3172	;  0x3172
-     292:	8b e0       	ldi	r24, 0x0B	; 11
+     292:	8c e0       	ldi	r24, 0x0C	; 12
      294:	61 e0       	ldi	r22, 0x01	; 1
      296:	0e 94 b9 18 	call	0x3172	;  0x3172
      29a:	ff cf       	rjmp	.-2      	;  0x29a
