@@ -1,0 +1,6 @@
+the Mirf/nrf24l01 library requires an *older* SPI library.
+
+In the arduino folder, replace the SPI folder with this Spi folder and add the mirf library.
+
+One arduino is 'client' - transmits its current "time", prints the ping time to serial
+One arduino uses 'server' - receives the time and acknowledges
