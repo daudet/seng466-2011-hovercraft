@@ -1,30 +1,119 @@
-/*
- * main.cpp
- *
- *  Created on: Jan 15, 2011
- *      Author: cei
- */
+/**
+     * An Mirf example which copies back the data it recives.
+     *
+     * Pins:
+     * Hardware SPI:
+     * MISO -> 12
+     * MOSI -> 11
+     * SCK -> 13
+     *
+     * Configurable:
+     * CE -> 8
+     * CSN -> 7
+     *
+     */
 
-#include <stdlib.h>
-#include "Core/WProgram.h"
-#include "avr/interrupt.h"
+#include "Spi/Spi.h"
+#include "Mirf/Mirf.h"
+#include "Mirf/nRF24L01.h"
 
-extern "C" void __cxa_pure_virtual()
-{
-    cli();    // disable interrupts
-    for(;;);  // do nothing until hard reset
+extern "C" void __cxa_pure_virtual(void){
+	for(;;);
 }
 
-int main()
-{
-    init();
-    pinMode(13, OUTPUT);
-    for(;;){
-    	digitalWrite(13,HIGH);
-    	delay(1000);
-    	digitalWrite(13,LOW);
-    	delay(1000);
+void setup(){
+	Serial.begin(9600);
+
+      /*
+       * Setup pins / SPI.
+       */
+
+    Mirf.csnPin = 9;
+    Mirf.cePin = 7;
+
+
+    Mirf.init();
+
+      /*
+       * Configure reciving address.
+       */
+
+    Mirf.setRADDR((byte *)"serv1");
+
+      /*
+       * Set the payload length to sizeof(unsigned long) the
+       * return type of millis().
+       *
+       * NB: payload on client and server must be the same.
+       */
+
+    Mirf.payload = sizeof(unsigned long);
+
+      /*
+       * Write channel and payload config then power up reciver.
+       */
+
+    Mirf.config();
+
+    Serial.println("Listening...");
+}
+
+void loop(){
+      /*
+       * A buffer to store the data.
+       */
+
+      byte data[Mirf.payload];
+
+      /*
+       * If a packet has been recived.
+       */
+      if(Mirf.dataReady()){
+
+        do{
+          Serial.println("Got packet");
+
+          /*
+           * Get load the packet into the buffer.
+           */
+
+          Mirf.getData(data);
+
+          /*
+           * Set the send address.
+           */
+
+
+          Mirf.setTADDR((byte *)"clie1");
+
+          /*
+           * Send the data back to the client.
+           */
+
+          Mirf.send(data);
+
+          /*
+           * Wait untill sending has finished
+           *
+           * NB: isSending returns the chip to receving after returning true.
+           */
+
+          while(Mirf.isSending()){
+            delay(100);
+          }
+
+          Serial.println("Reply sent.");
+        }while(!Mirf.rxFifoEmpty());
     }
-    for (;;) {}
+}
+
+int main(){
+
+	init();
+	setup();
+
+	for (;;) {
+    	loop();
+    }
     return 0;
 }
