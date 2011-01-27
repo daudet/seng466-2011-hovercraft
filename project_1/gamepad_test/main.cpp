@@ -16,95 +16,77 @@ extern "C" void __cxa_pure_virtual(){
 int main(void){
 
 	init();
+
+	TCCR3B |= _BV(CS30);
+	TCCR3B &= ~_BV(CS32);
+	TCCR3B &= ~_BV(CS31);
+
+	pinMode(2, OUTPUT);
+	pinMode(3, OUTPUT);
+
+	//Motor directions
+	pinMode(8, OUTPUT);
+	pinMode(9, OUTPUT);
+	pinMode(10, OUTPUT);
+	pinMode(11, OUTPUT);
+
+	digitalWrite(8, LOW);
+	digitalWrite(9, HIGH);
+
+	digitalWrite(10, LOW);
+	digitalWrite(11, HIGH);
+
+	digitalWrite(2, LOW);
+	digitalWrite(3,LOW);
+
 	Serial.begin(38400);
-	uint8_t data[20];
+	int8_t data[18];
+
+
 	uint8_t i = 0;
+	for(i = 0; i < 18; i++){
+		data[i] = 0;
+	}
 
 	pinMode(13, OUTPUT);
 
 	for(;;){
 		// wait until a full packet has been buffered
-		delay(100);
-		//while (Serial.available() < 20);
-
+		while (Serial.available() < 18);
 
 		//fill the buffer with the 20 bytes received
-		for (i = 0; i < 20; i++)
+		for (i = 0; i < 18 ; i++)
 			data[i] = Serial.read();
+		Serial.flush();
 
-		//if button one is pressed blink LED pin 13
-		if(data[0] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
+		//RIGHTSIDE
+		if(data[15] < 0){ //UP
+			digitalWrite(8, LOW);
+			digitalWrite(9, HIGH);
+			analogWrite(2, abs(data[15])<<1);
 		}
-
-		if(data[1] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
+		else if(data[15] > 0){ //DOWN
+			digitalWrite(8, HIGH);
+			digitalWrite(9, LOW);
+			analogWrite(2, abs(data[15])<<1);
 		}
-
-		if(data[2] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
-		}
-		if(data[3] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
+		else{
+			digitalWrite(2, LOW);
 		}
 
-		if(data[4] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
+		//LEFTSIDE
+		if(data[13] < 0){//UP
+			digitalWrite(10, LOW);
+			digitalWrite(11, HIGH);
+			analogWrite(3, abs(data[13])<<1);
 		}
-
-		if(data[5] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
+		else if(data[13] > 0){//DOWN
+			digitalWrite(10, HIGH);
+			digitalWrite(11, LOW);
+			analogWrite(3, abs(data[13])<<1);
 		}
-
-		if(data[6] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
-		}
-		if(data[7] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
-		}
-		if(data[8] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
-		}
-
-		if(data[9] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
-		}
-
-		if(data[10] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
-		}
-		if(data[11] == 1){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13,LOW);
-		}
-
-		if(data[13] == 99){
-			digitalWrite(13,HIGH);
-			delay(10);
-			digitalWrite(13, LOW);
+		else{
+			digitalWrite(3, LOW);
 		}
 	}
 
