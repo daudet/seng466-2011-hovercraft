@@ -43,6 +43,12 @@
 </tool>
 <tool id="de.innot.avreclipse.tool.linker.winavr.app.release.170347359" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.release"/>
 <tool id="de.innot.avreclipse.tool.cpplinker.app.release.1271335986" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.release">
+<option id="de.innot.avreclipse.cpplinker.option.libs.369305673" name="Libraries (-l)" superClass="de.innot.avreclipse.cpplinker.option.libs" valueType="libs">
+<listOptionValue builtIn="false" value="Uno"/>
+</option>
+<option id="de.innot.avreclipse.cpplinker.option.libpath.1082382772" name="Libraries Path (-L)" superClass="de.innot.avreclipse.cpplinker.option.libpath" valueType="stringList">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Basestation/lib}&quot;"/>
+</option>
 <inputType id="de.innot.avreclipse.tool.cpplinker.input.544521677" name="OBJ Files" superClass="de.innot.avreclipse.tool.cpplinker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -553,7 +559,8 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-		</cconfiguration>
+		<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 <project id="Basestation.de.innot.avreclipse.project.winavr.elf_2.1.0.2101101468" name="AVR Cross Target Application" projectType="de.innot.avreclipse.project.winavr.elf_2.1.0"/>

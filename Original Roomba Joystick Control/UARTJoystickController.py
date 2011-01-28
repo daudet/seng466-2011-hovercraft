@@ -99,9 +99,9 @@ class UARTJoystickController(threading.Thread):
                     self._packets.append(packet)
                 
                 if self._debug:
-                    #self.log.info('Buttons:\t' + str(buttons))
+                    self.log.info('Buttons:\t' + str(buttons))
                     self.log.info('Axes\t\t' + str(axes))
-                    #self.log.info('Hat:\t\t' + str(hat))
+                    self.log.info('Hat:\t\t' + str(hat))
                     self.log.info('-' * 50)
                 
                 time.sleep(0.15)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     log = logging.getLogger()
     log.addHandler(console)
     
-    joy = UARTJoystickController(debug=False)
+    joy = UARTJoystickController(debug=True)
     #joy.run()
     
     ua = UARTSystem.UART(serialPort, baudRate, take_input=True, cli=joy, approve=False, debug=False)
