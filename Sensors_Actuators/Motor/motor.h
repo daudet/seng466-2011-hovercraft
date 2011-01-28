@@ -5,10 +5,17 @@
  *      Author: cei
  */
 
-#define E1-2 3
-#define E3-4 2
-#define L1 10
-#define L2 11
-#define L3 8
-#define L4 9
+#include "../Core/WProgram.h"
+
+#define E1_2 3 //left
+#define E3_4 2 //right
+#define L1   10 //left
+#define L2   11 //left
+#define L3   8 //right
+#define L4   9 //right
+
+void motorinit();
+void updateRight(int8_t);
+void updateLeft(int8_t);
+
 
