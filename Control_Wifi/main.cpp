@@ -18,21 +18,31 @@ extern "C" void __cxa_pure_virtual()
     for(;;);  // do nothing until hard reset
 }
 
+void blink();
+
 int main()
 {
     init();
-    setup();
-    //pinMode(13, OUTPUT);
-    //for(;;){
-    //	digitalWrite(13,HIGH);
-    //	delay(1000);
-    //	digitalWrite(13,LOW);
-    //	delay(1000);
-    //}
-    for (;;) {loop();}
+    blink();
+
+    //setup();
+    //for (;;) {loop();}
+    for (;;) {}
     return 0;
 }
 
+void blink()
+{
+	pinMode(13, OUTPUT);
+
+	for(;;)
+	{
+	    digitalWrite(13,HIGH);
+	    delay(500);
+	    digitalWrite(13,LOW);
+	    delay(500);
+	}
+}
 
 /**
  * A Mirf example to test the latency between two Ardunio.
@@ -50,7 +60,6 @@ int main()
  * This depends on the Spi Library:
  * http://www.arduino.cc/playground/Code/Spi
  */
-
 
 
 void setup(){

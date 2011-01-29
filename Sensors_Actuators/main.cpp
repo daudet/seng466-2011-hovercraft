@@ -11,13 +11,15 @@
 #include "Motor/motor.h"
 #include "Sonar/sonar.h"
 #include "UART/UART.h"
-
+void blink();
 
 extern "C" void __cxa_pure_virtual()
 {
     cli();    // disable interrupts
     for(;;);  // do nothing until hard reset
 }
+
+
 
 int main()
 {
