@@ -10,8 +10,8 @@
 #include "avr/interrupt.h"
 #include "Motor/motor.h"
 #include "Sonar/sonar.h"
-#define BUFFERSIZE 18
-#define BAUD 38400
+#include "UART/UART.h"
+
 
 extern "C" void __cxa_pure_virtual()
 {
@@ -21,48 +21,35 @@ extern "C" void __cxa_pure_virtual()
 
 int main()
 {
+
     init();
     //blink();
 	motorinit();
 	sonarinit();
+	UARTinit();
 
-
-    //Open serial
-	Serial.begin(BAUD);
-
-	//counter
-	uint8_t i = 0;
-
-	//input buffer
-	int8_t input[BUFFERSIZE];
-	for(i = 0; i < BUFFERSIZE; i++)
-		input[i] = 0;
-
-	//output buffer
-	byte output[BUFFERSIZE];
-	for(i = 0; i < BUFFERSIZE; i++)
-		output[i] = 0;
+    byte input[BUFFERSIZE];
+    byte output[BUFFERSIZE];
+	UARTinitbuffer(input);
+	UARTinitbuffer(output);
 
 	for(;;){
 
-		// wait until a full packet has been buffered
-		while (Serial.available() < BUFFERSIZE);
-
-		//fill the buffer with the bytes received
-		for (i = 0; i < BUFFERSIZE ; i++)
-			input[i] = Serial.read();
-		Serial.flush();
+		//receive motor commands
+		UARTreceive(input);
 
 		//drive motors
-		updateRight(input[13]);
-		updateLeft(input[15]);
+		updateRight((int8_t) input[13]);
+		updateLeft((int8_t) input[15]);
 
 		//read sonar
-		output[0]=1;
-		output[1]=2;
+		output[0] = 1;
+		output[1] = 2;
 
 		//send sonar
-		Serial.write(output,BUFFERSIZE);
+		UARTsend(output);
+
+
 
 	}
 

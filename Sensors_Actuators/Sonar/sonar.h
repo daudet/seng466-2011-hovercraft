@@ -5,7 +5,6 @@
  *      Author: cei
  */
 
-#include "../Core/WProgram.h"
 
 #define PWL 7 //left
 #define PWR 6 //right

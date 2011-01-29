@@ -6,6 +6,7 @@
  */
 
 #include "sonar.h"
+#include "../Core/WProgram.h"
 
 void sonarinit()
 {
