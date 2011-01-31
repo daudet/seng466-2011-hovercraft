@@ -23,9 +23,17 @@ void UARTinitbuffer(byte* buffer)
 void UARTreceive(byte* buffer)
 {
 	byte i = 0;
-
+	unsigned long t=millis();
 	// wait until a full packet has been buffered
-	while (Serial.available() < BUFFERSIZE);
+	while (Serial.available() < BUFFERSIZE)
+	{
+		if ((millis()-t)>TO)
+		{
+			UARTinitbuffer(buffer);
+			return;
+		}
+	}
+
 
 	//fill the buffer with the bytes received
 	for (i = 0; i < BUFFERSIZE ; i++)

@@ -35,14 +35,15 @@ int main()
 	UARTinitbuffer(input);
 	UARTinitbuffer(output);
 
-	for(;;){
+	for(;;)
+	{
 
 		//receive motor commands
 		UARTreceive(input);
 
 		//drive motors
-		updateRight((int8_t) input[13]);
-		updateLeft((int8_t) input[15]);
+		updateRight((int8_t) input[0]);
+		updateLeft((int8_t) input[1]);
 
 		//read sonar
 		output[0] = 1;
@@ -50,8 +51,6 @@ int main()
 
 		//send sonar
 		UARTsend(output);
-
-
 
 	}
 

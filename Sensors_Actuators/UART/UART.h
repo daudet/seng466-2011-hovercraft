@@ -7,8 +7,9 @@
 
 #include "../Core/WProgram.h"
 
-#define BUFFERSIZE 18
+#define BUFFERSIZE 4
 #define BAUD 38400
+#define TO 400
 
 void UARTinit();
 void UARTinitbuffer(byte*);
