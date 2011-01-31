@@ -43,14 +43,71 @@ Released for free under a Creative Commons Attribution 2.5 License
 	<div id="content">
 		<div class="post">
 			<h1 class="title">Software Environment</h1>
+			
+			<h1 class="title">Basic Arduino IDE</h1>
+			<p>When first starting Arduino programming, the integrated 
+			development environment (IDE) makes creating a "sketch" of code 
+			very easy. Even if someone has never programmed before, following 
+			some sample projects will get code executing on the board in a 
+			matter of minutes.
+			</p>
+
+			<p>There is a lot of abstraction when using the provided IDE 
+			however, and a lot of things are going on behind the scenes that 
+			are not visible to the developer. Due to the nature of this 
+			project, using the IDE will not provide the depth that we will 
+			need to accomplish some lower level tasks. For this reason we will 
+			be using Eclipse for most of our developping. 
+			</p>
+
+			<h1 class="title">AVR Dude and AVR-GCC</h1>
+			<p>Discuss the other tools that are needed for the environment
+			</p>
+
+
+			<h1 class="title">Eclipse</h1>
+			<p>Setting up Eclipse for Arduino was fairly straight 
+			forward since the lab TA had a nice tutorial on his web page. It 
+			does take a while to set up a project and begin coding. The hope 
+			is that it will save time in the long run, but only time will tell.
+			We have set up a Subversion repository to host our source code, but
+			could not get the Eclipse subversion plugin to work correctly. 
+			The plugin would act as a subversion client and allow us to commit
+			and update our source code in Eclipse. This wasn't an issue as we
+			were still able to use regular SVN clients and import the project
+			into eclipse from the local file system.
+			</p>
+
+			<h1 class="title">Major Issues with Eclipse</h1>
+			<p>Once our three basic C++ projects were created (one for
+			each of the three Arduino boards we are using) we were ready
+			to start coding and sharing the projects amongst the three of
+			us. We soon found out that some of the files were including, namely
+			a library .a file (lib.a) that was compiled by the Arduino IDE, were
+			not necessary. Due to the nature of embedded programming and the
+			limited storage on the boards, we wanted to keep the code overhead
+			to a minimum.
+			</p>
+			
+			<p>We began working with Eclipse and including core
+			header and source files and excluding the library file. It seemed to
+			work on the lab machine without the library file, but would not work
+			on the MAC Eclipse environment. Some of the projects would work
+			with the ATMega board, but would not work with the UNO boards. We
+			are including the library files for projects on the UNO boards and
+			will be using the MAC environment as the AVRDude version seems to 
+			work better than the version on the lab WINDOWS machines.
+			</p>
+
+
+
+
 		</div>
 	</div>
 	<div id="sidebar">
 		<h2>Project 1</h2>
-		<a href="problem.html">Problem Description</a><br />
 		<a href="software.html">Software Environment</a><br />
 		<a href="hardware.html">Hardware Overview</a><br />
-		<a href="sensors.html">Sensors</a><br />
 		<a href="gamepad.html">USB PS2 Gamepad</a><br />
 		<a href="wireless.html">Wireless Radio</a><br />
 		<a href="platform.html">Platform Design</a><br />
