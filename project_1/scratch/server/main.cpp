@@ -27,24 +27,24 @@
 #include "Mirf/nRF24L01.h"
 #include "Core/wiring.h"
 #include "Wire/Wire.h"
+#include "UART/UART.h"
 
 extern "C" void __cxa_pure_virtual(void);
-void __cxa_pure_virtual(void){}
+void __cxa_pure_virtual(void){
+	cli();
+	for(;;);
+}
 
 int main(void)
 {
 	init();
-
-	Serial.begin(9600);
-	Serial.println("Starting Server...");
+	UARTinit();
 
 	//setup analog pins to be used as output
 	pinMode(A2, OUTPUT);
 	pinMode(A3, OUTPUT);
-
 	//set A2 to GND
 	digitalWrite(A2, LOW);
-
 	//set A3 to +5v
 	digitalWrite(A3, HIGH);
 
@@ -52,26 +52,18 @@ int main(void)
 
 	Mirf.csnPin = 7;
 	Mirf.cePin = 8;
-
 	Mirf.init();
-
-	//Configure reciving address.
 	Mirf.setRADDR((byte *)"serv1");
-
-   // Set the payload length to sizeof(unsigned long) the
-   // return type of millis().
-   //NB: payload on client and server must be the same.
-
-	Mirf.payload = sizeof(byte) * 18;
-
-	//Write channel and payload config then power up reciver.
+	Mirf.setTADDR((byte*)"clie1");
+	Mirf.payload = 18;
 	Mirf.config();
 
-	Serial.println("Listening...");
+	byte data[Mirf.payload];
 
 	for(;;){
 		Serial.flush();
-		byte data[Mirf.payload];
+
+		initbuffer(data, 18);
 
 		Wire.beginTransmission(0x09);
 		Wire.send('n');
@@ -81,14 +73,10 @@ int main(void)
 		Wire.endTransmission();
 
 		if(Mirf.dataReady()){
-			do{
-				//Serial.println("Got packet!");
+			//do{
 				Mirf.getData(data);
 
-				Serial.write(data,18);
-
 				if((int8_t)data[15] < 0){
-					//Serial.println("Got right joystick UP command...");
 
 					Wire.beginTransmission(0x09);
 					Wire.send('n');
@@ -98,7 +86,6 @@ int main(void)
 					Wire.endTransmission();
 				}
 				if((int8_t)data[13] < 0){
-					//Serial.println("Got left joystick UP command...");
 
 					Wire.beginTransmission(0x09);
 					Wire.send('n');
@@ -108,14 +95,8 @@ int main(void)
 					Wire.endTransmission();
 				}
 
-				Mirf.setTADDR((byte*)"clie1");
-				Mirf.send(data);
-				while(Mirf.isSending()){
-					//delay(100);
-				}
-				//Serial.println("Reply Sent...");
-
-			}while(!Mirf.rxFifoEmpty());
+			//}
+				while(!Mirf.rxFifoEmpty());
 		}
 	}
 	for (;;);
