@@ -44,6 +44,5 @@ void UARTreceive(byte* buffer, byte size)
 void UARTsend(byte* buffer, byte size)
 {
 	Serial.write(buffer, size);
-	initbuffer(buffer, size);
 }
 

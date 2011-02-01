@@ -28,33 +28,16 @@
 #include "Core/wiring.h"
 #include "Wire/Wire.h"
 #include "UART/UART.h"
-#include "MIRF/Mirf2.h"
 
 extern "C" void __cxa_pure_virtual(void);
-void __cxa_pure_virtual(void)
-{
-    cli();    // disable interrupts
-    for(;;);  // do nothing until hard reset
+void __cxa_pure_virtual(void){
+	cli();
+	for(;;);
 }
-
-void blink()
-{
-	pinMode(13, OUTPUT);
-
-	for(;;)
-	{
-	    digitalWrite(13,HIGH);
-	    delay(500);
-	    digitalWrite(13,LOW);
-	    delay(500);
-	}
-}
-
 
 int main(void)
 {
 	init();
-	//blink();
 	UARTinit();
 
 	//setup analog pins to be used as output
@@ -67,56 +50,54 @@ int main(void)
 
 	Wire.begin();
 
-	MIRFinit(2);
+	Mirf.csnPin = 7;
+	Mirf.cePin = 8;
+	Mirf.init();
+	Mirf.setRADDR((byte *)"serv1");
+	Mirf.setTADDR((byte*)"clie1");
+	Mirf.payload = 18;
+	Mirf.config();
 
-	byte WIFIdata[4];
-	byte UARTdata[4];
-
-	initbuffer(UARTdata, 4);
-	initbuffer(WIFIdata, 4);
-
-	Wire.beginTransmission(0x09);
-	Wire.send('n');
-	Wire.send(0x00);
-	Wire.send(0x00);
-	Wire.send(0x00);
-	Wire.endTransmission();
+	byte data[Mirf.payload];
 
 	for(;;){
+		Serial.flush();
 
-		MIRFreceive(WIFIdata);
-		//Serial.write(data, 4);
+		initbuffer(data, 18);
 
-		if((int8_t)WIFIdata[0] < 0){
-			//Serial.println("Got right joystick UP command...");
+		Wire.beginTransmission(0x09);
+		Wire.send('n');
+		Wire.send(0x00);
+		Wire.send(0x00);
+		Wire.send(0x00);
+		Wire.endTransmission();
 
-			Wire.beginTransmission(0x09);
-			Wire.send('n');
-			Wire.send(0x00);
-			Wire.send(0xff);
-			Wire.send(0x00);
-			Wire.endTransmission();
+		if(Mirf.dataReady()){
+			//do{
+				Mirf.getData(data);
+
+				if((int8_t)data[15] < 0){
+
+					Wire.beginTransmission(0x09);
+					Wire.send('n');
+					Wire.send(0x00);
+					Wire.send(0xff);
+					Wire.send(0x00);
+					Wire.endTransmission();
+				}
+				if((int8_t)data[13] < 0){
+
+					Wire.beginTransmission(0x09);
+					Wire.send('n');
+					Wire.send(0x00);
+					Wire.send(0x00);
+					Wire.send(0xff);
+					Wire.endTransmission();
+				}
+
+			//}
+				while(!Mirf.rxFifoEmpty());
 		}
-		if((int8_t)WIFIdata[1] < 0){
-			//Serial.println("Got left joystick UP command...");
-
-			Wire.beginTransmission(0x09);
-			Wire.send('n');
-			Wire.send(0x00);
-			Wire.send(0x00);
-			Wire.send(0xff);
-			Wire.endTransmission();
-		}
-
-		//UARTsend(WIFIdata, 4);
-
-		//Mirf.setTADDR((byte*)"clie1");
-		//Mirf.send(data);
-		//while(Mirf.isSending()){
-		//delay(100);
-		//}
-		//Serial.println("Reply Sent...");
-
 	}
 	for (;;);
 

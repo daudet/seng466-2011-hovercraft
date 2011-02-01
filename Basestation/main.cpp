@@ -21,38 +21,42 @@
 #include "Mirf/Mirf.h"
 #include "Mirf/nRF24L01.h"
 #include "UART/UART.h"
-#include "MIRF/Mirf2.h"
 
 extern "C" void __cxa_pure_virtual(void);
-void __cxa_pure_virtual(void)
-{
-    cli();    // disable interrupts
-    for(;;);  // do nothing until hard reset
-}
+void __cxa_pure_virtual(void){}
 
 int main(void)
 {
 	init();
-
 	UARTinit();
 
-	MIRFinit(1);
+	//Serial.begin(38400);
 
-	byte WIFIdata[4];
-	byte UARTdata[4];
-	byte GAMEdata[18];
+	Mirf.csnPin = 7;
+	Mirf.cePin = 8;
+	Mirf.init();
+	Mirf.setRADDR((byte *)"clie1");
+	Mirf.payload = 18;
+	Mirf.setTADDR((byte *)"serv1");
+	Mirf.config();
 
-	initbuffer(UARTdata, 4);
-	initbuffer(WIFIdata, 4);
-	initbuffer(GAMEdata, 18);
+	//MIRFinit(1);
+
+	byte data[18];
+	//uint8_t i = 0;
 
 	for(;;){
 
-		UARTreceive(GAMEdata,18);
-		WIFIdata[0]=GAMEdata[13];
-		WIFIdata[1]=GAMEdata[15];
+		//initialize the data
+		//for(i = 0; i < 18; i++)
+			//data[i] = 0;
 
-		MIRFsend(WIFIdata);
+		initbuffer(data, 18);
+		UARTreceive(data, 18);
+
+		Mirf.send(data);
+
+		while(Mirf.isSending());
 
 	}
 	for (;;);
