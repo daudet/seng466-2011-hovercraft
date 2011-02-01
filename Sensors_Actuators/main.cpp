@@ -11,7 +11,6 @@
 #include "Motor/motor.h"
 #include "Sonar/sonar.h"
 #include "UART/UART.h"
-void blink();
 
 extern "C" void __cxa_pure_virtual()
 {
@@ -19,7 +18,18 @@ extern "C" void __cxa_pure_virtual()
     for(;;);  // do nothing until hard reset
 }
 
+void blink()
+{
+	pinMode(13, OUTPUT);
 
+	for(;;)
+	{
+	    digitalWrite(13,HIGH);
+	    delay(500);
+	    digitalWrite(13,LOW);
+	    delay(500);
+	}
+}
 
 int main()
 {
@@ -58,15 +68,3 @@ int main()
     return 0;
 }
 
-void blink()
-{
-	pinMode(13, OUTPUT);
-
-	for(;;)
-	{
-	    digitalWrite(13,HIGH);
-	    delay(500);
-	    digitalWrite(13,LOW);
-	    delay(500);
-	}
-}

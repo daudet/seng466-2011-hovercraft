@@ -24,7 +24,11 @@
 #include "MIRF/Mirf2.h"
 
 extern "C" void __cxa_pure_virtual(void);
-void __cxa_pure_virtual(void){}
+void __cxa_pure_virtual(void)
+{
+    cli();    // disable interrupts
+    for(;;);  // do nothing until hard reset
+}
 
 int main(void)
 {

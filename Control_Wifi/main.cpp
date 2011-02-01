@@ -31,11 +31,30 @@
 #include "MIRF/Mirf2.h"
 
 extern "C" void __cxa_pure_virtual(void);
-void __cxa_pure_virtual(void){}
+void __cxa_pure_virtual(void)
+{
+    cli();    // disable interrupts
+    for(;;);  // do nothing until hard reset
+}
+
+void blink()
+{
+	pinMode(13, OUTPUT);
+
+	for(;;)
+	{
+	    digitalWrite(13,HIGH);
+	    delay(500);
+	    digitalWrite(13,LOW);
+	    delay(500);
+	}
+}
+
 
 int main(void)
 {
 	init();
+	//blink();
 	UARTinit();
 
 	//setup analog pins to be used as output

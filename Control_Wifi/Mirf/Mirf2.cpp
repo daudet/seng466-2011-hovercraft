@@ -6,6 +6,8 @@
  */
 
 #include "Mirf2.h"
+#include "../Core/WProgram.h"
+#include "Mirf.h"
 
 void MIRFinit(byte select)
 {
@@ -32,8 +34,8 @@ void MIRFsend(byte* buffer)
 	Mirf.send(buffer);
 }
 
-void MIRFreceive(byte*)
+void MIRFreceive(byte* buffer)
 {
 	while(!Mirf.dataReady());
-	Mirf.getData(WIFIdata);
+	Mirf.getData(buffer);
 }

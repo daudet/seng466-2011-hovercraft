@@ -5,6 +5,8 @@
  *      Author: cei
  */
 
+#include "../Core/WProgram.h"
+
 void MIRFinit(byte);
 void MIRFsend(byte*);
 void MIRFreceive(byte*);

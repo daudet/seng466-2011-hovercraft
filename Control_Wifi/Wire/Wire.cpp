@@ -21,7 +21,7 @@ extern "C" {
   #include <stdlib.h>
   #include <string.h>
   #include <inttypes.h>
-  #include "twi.h"
+  #include "utility/twi.h"
 }
 
 #include "Wire.h"
@@ -135,7 +135,7 @@ void TwoWire::send(uint8_t data)
     // put byte in tx buffer
     txBuffer[txBufferIndex] = data;
     ++txBufferIndex;
-    // update amount in buffer   
+    // update amount in buffer
     txBufferLength = txBufferIndex;
   }else{
   // in slave send mode
@@ -193,7 +193,7 @@ uint8_t TwoWire::receive(void)
   // default to returning null char
   // for people using with char strings
   uint8_t value = '\0';
-  
+
   // get each successive byte on each call
   if(rxBufferIndex < rxBufferLength){
     value = rxBuffer[rxBufferIndex];
@@ -219,7 +219,7 @@ void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
   // copy twi rx buffer into local read buffer
   // this enables new reads to happen in parallel
   for(uint8_t i = 0; i < numBytes; ++i){
-    rxBuffer[i] = inBytes[i];    
+    rxBuffer[i] = inBytes[i];
   }
   // set rx iterator vars
   rxBufferIndex = 0;
