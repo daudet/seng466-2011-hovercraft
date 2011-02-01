@@ -7,12 +7,11 @@
 
 #include "../Core/WProgram.h"
 
-#define BUFFERSIZE 4
 #define BAUD 38400
 #define TO 400
 
 void UARTinit();
-void UARTinitbuffer(byte*);
-void UARTreceive(byte*);
-void UARTsend(byte*);
+void initbuffer(byte*, byte);
+void UARTreceive(byte*, byte);
+void UARTsend(byte*, byte);
 

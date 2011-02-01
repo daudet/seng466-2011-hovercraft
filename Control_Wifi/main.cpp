@@ -1,51 +1,13 @@
 /*
+ * BASESTATION SERVER
+ *	This basestation will send data gathered from the serial
+ *	port to the remote station via radio signal and
+ *	cause the ATMega to adjust the dc motor accordingly
+ *
  * main.cpp
  *
- *  Created on: Jan 15, 2011
- *      Author: cei
- */
-
-#include <stdlib.h>
-#include "Core/WProgram.h"
-#include "avr/interrupt.h"
-#include "Spi/Spi.h"
-#include "Mirf/Mirf.h"
-#include "Mirf/nRF24L01.h"
-
-extern "C" void __cxa_pure_virtual()
-{
-    cli();    // disable interrupts
-    for(;;);  // do nothing until hard reset
-}
-
-void blink();
-
-int main()
-{
-    init();
-    blink();
-
-    //setup();
-    //for (;;) {loop();}
-    for (;;) {}
-    return 0;
-}
-
-void blink()
-{
-	pinMode(13, OUTPUT);
-
-	for(;;)
-	{
-	    digitalWrite(13,HIGH);
-	    delay(500);
-	    digitalWrite(13,LOW);
-	    delay(500);
-	}
-}
-
-/**
- * A Mirf example to test the latency between two Ardunio.
+ *  Created on: Jan 30, 2011
+ *      Author: davidaudet
  *
  * Pins:
  * Hardware SPI:
@@ -57,78 +19,87 @@ void blink()
  * CE -> 8
  * CSN -> 7
  *
- * This depends on the Spi Library:
- * http://www.arduino.cc/playground/Code/Spi
  */
 
+#include "Core/WProgram.h"
+#include "Spi/Spi.h"
+#include "Mirf/Mirf.h"
+#include "Mirf/nRF24L01.h"
+#include "Core/wiring.h"
+#include "Wire/Wire.h"
+#include "UART/UART.h"
+#include "MIRF/Mirf2.h"
 
-void setup(){
-  Serial.begin(9600);
-  /*
-   * Setup pins / SPI.
-   */
+extern "C" void __cxa_pure_virtual(void);
+void __cxa_pure_virtual(void){}
 
+int main(void)
+{
+	init();
+	UARTinit();
 
-   Mirf.csnPin = 9;
-   Mirf.cePin = 7;
+	//setup analog pins to be used as output
+	pinMode(A2, OUTPUT);
+	pinMode(A3, OUTPUT);
+	//set A2 to GND
+	digitalWrite(A2, LOW);
+	//set A3 to +5v
+	digitalWrite(A3, HIGH);
 
+	Wire.begin();
 
-  Mirf.init();
+	MIRFinit(2);
 
-  /*
-   * Configure reciving address.
-   */
+	byte WIFIdata[4];
+	byte UARTdata[4];
 
-  Mirf.setRADDR((byte *)"clie1");
+	initbuffer(UARTdata, 4);
+	initbuffer(WIFIdata, 4);
 
-  /*
-   * Set the payload length to sizeof(unsigned long) the
-   * return type of millis().
-   *
-   * NB: payload on client and server must be the same.
-   */
+	Wire.beginTransmission(0x09);
+	Wire.send('n');
+	Wire.send(0x00);
+	Wire.send(0x00);
+	Wire.send(0x00);
+	Wire.endTransmission();
 
-  Mirf.payload = sizeof(unsigned long);
+	for(;;){
 
-  /*
-   * Write channel and payload config then power up reciver.
-   */
+		MIRFreceive(WIFIdata);
+		//Serial.write(data, 4);
 
-  /*
-   * To change channel:
-   *
-   * Mirf.channel = 10;
-   *
-   * NB: Make sure channel is legal in your area.
-   */
+		if((int8_t)WIFIdata[0] < 0){
+			//Serial.println("Got right joystick UP command...");
 
-  Mirf.config();
+			Wire.beginTransmission(0x09);
+			Wire.send('n');
+			Wire.send(0x00);
+			Wire.send(0xff);
+			Wire.send(0x00);
+			Wire.endTransmission();
+		}
+		if((int8_t)WIFIdata[1] < 0){
+			//Serial.println("Got left joystick UP command...");
 
-  Serial.println("Beginning ... ");
+			Wire.beginTransmission(0x09);
+			Wire.send('n');
+			Wire.send(0x00);
+			Wire.send(0x00);
+			Wire.send(0xff);
+			Wire.endTransmission();
+		}
+
+		//UARTsend(WIFIdata, 4);
+
+		//Mirf.setTADDR((byte*)"clie1");
+		//Mirf.send(data);
+		//while(Mirf.isSending()){
+		//delay(100);
+		//}
+		//Serial.println("Reply Sent...");
+
+	}
+	for (;;);
+
+	return 0;
 }
-
-void loop(){
-  unsigned long time = millis();
-
-  Mirf.setTADDR((byte *)"serv1");
-
-  Mirf.send((byte *)&time);
-
-  while(Mirf.isSending()){
-  }
-  Serial.println("Finished sending");
-  delay(10);
-  while(!Mirf.dataReady()){
-    //Serial.println("Waiting");
-  }
-
-  Mirf.getData((byte *) &time);
-
-  Serial.print("Ping: ");
-  Serial.println((millis() - time));
-
-  delay(1000);
-}
-
-
-
