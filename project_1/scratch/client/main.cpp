@@ -20,7 +20,6 @@
 #include "Spi/Spi.h"
 #include "Mirf/Mirf.h"
 #include "Mirf/nRF24L01.h"
-#include "UART/UART.h"
 
 extern "C" void __cxa_pure_virtual(void);
 void __cxa_pure_virtual(void){}
@@ -29,8 +28,8 @@ int main(void)
 {
 	init();
 
-	UARTinit();
-	//Serial.println("Starting Client...");
+	Serial.begin(38400);
+	Serial.println("Starting Client...");
 
 	Mirf.csnPin = 7;
 	Mirf.cePin = 8;
@@ -44,30 +43,34 @@ int main(void)
    // return type of millis().
    //NB: payload on client and server must be the same.
 
-	Mirf.payload = sizeof(byte) * 4;
+	Mirf.payload = sizeof(byte) * 18;
 
 	//Write channel and payload config then power up reciver.
 	Mirf.config();
 
-	//Serial.println("Starting to send...");
-	byte WIFIdata[Mirf.payload];
-	byte UARTdata[Mirf.payload];
-	byte GAMEdata[18];
-
-	initbuffer(UARTdata, 4);
-	initbuffer(WIFIdata, 4);
-	initbuffer(GAMEdata, 18);
+	Serial.println("Starting to send...");
 
 	for(;;){
+		byte data[18];
+		uint8_t i = 0;
 
-		UARTreceive(GAMEdata,18);
+		//initialize the data
+		for(i = 0; i < 18; i++){
+				data[i] = 0;
+		}
+		//wait until a full packet has been buffered
+		while (Serial.available() < 18);
 
-		WIFIdata[0]=GAMEdata[13];
-		WIFIdata[1]=GAMEdata[15];
+		//fill the buffer with the 20 bytes received
+		for (i = 0; i < 18 ; i++)
+			data[i] = Serial.read();
+
+		//flush the serial buffer
+		Serial.flush();
 
 		Mirf.setTADDR((byte *)"serv1");
 
-		Mirf.send(WIFIdata);
+		Mirf.send(data);
 
 		while(Mirf.isSending()){
 		  }

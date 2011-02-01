@@ -27,7 +27,6 @@
 #include "Mirf/nRF24L01.h"
 #include "Core/wiring.h"
 #include "Wire/Wire.h"
-#include "UART/UART.h"
 
 extern "C" void __cxa_pure_virtual(void);
 void __cxa_pure_virtual(void){}
@@ -35,9 +34,9 @@ void __cxa_pure_virtual(void){}
 int main(void)
 {
 	init();
-	UARTinit();
-	//Serial.begin(9600);
-	//Serial.println("Starting Server...");
+
+	Serial.begin(9600);
+	Serial.println("Starting Server...");
 
 	//setup analog pins to be used as output
 	pinMode(A2, OUTPUT);
@@ -63,17 +62,16 @@ int main(void)
    // return type of millis().
    //NB: payload on client and server must be the same.
 
-	Mirf.payload = sizeof(byte) * 4;
+	Mirf.payload = sizeof(byte) * 18;
 
 	//Write channel and payload config then power up reciver.
 	Mirf.config();
 
-	//Serial.println("Listening...");
-	byte WIFIdata[Mirf.payload];
-	initbuffer(WIFIdata, Mirf.payload);
+	Serial.println("Listening...");
 
 	for(;;){
-
+		Serial.flush();
+		byte data[Mirf.payload];
 
 		Wire.beginTransmission(0x09);
 		Wire.send('n');
@@ -85,11 +83,11 @@ int main(void)
 		if(Mirf.dataReady()){
 			do{
 				//Serial.println("Got packet!");
-				Mirf.getData(WIFIdata);
+				Mirf.getData(data);
 
-				//Serial.write(data, 4);
+				Serial.write(data,18);
 
-				if((int8_t)WIFIdata[0] < 0){
+				if((int8_t)data[15] < 0){
 					//Serial.println("Got right joystick UP command...");
 
 					Wire.beginTransmission(0x09);
@@ -99,7 +97,7 @@ int main(void)
 					Wire.send(0x00);
 					Wire.endTransmission();
 				}
-				if((int8_t)WIFIdata[1] < 0){
+				if((int8_t)data[13] < 0){
 					//Serial.println("Got left joystick UP command...");
 
 					Wire.beginTransmission(0x09);
@@ -110,13 +108,11 @@ int main(void)
 					Wire.endTransmission();
 				}
 
-				UARTsend(WIFIdata, Mirf.payload);
-
-				//Mirf.setTADDR((byte*)"clie1");
-				//Mirf.send(data);
-				//while(Mirf.isSending()){
+				Mirf.setTADDR((byte*)"clie1");
+				Mirf.send(data);
+				while(Mirf.isSending()){
 					//delay(100);
-				//}
+				}
 				//Serial.println("Reply Sent...");
 
 			}while(!Mirf.rxFifoEmpty());
