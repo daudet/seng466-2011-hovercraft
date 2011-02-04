@@ -123,7 +123,6 @@ int main()
 
 	for (;;)
 	    {
-			blink_orange();
 	        if (rxflag)
 	        {
 	            if (Radio_Receive(&packet) != RADIO_RX_MORE_PACKETS)
@@ -142,36 +141,28 @@ int main()
 	                Serial.print(output);
 	                continue;
 	            }
-	            //light_up the LED
-	            blink_green();
+
 
 	            // Set the transmit address to the one specified in the message packet.
-	            Radio_Set_Tx_Addr(packet.payload.message.address);
+	            //Radio_Set_Tx_Addr(packet.payload.message.address);
 
 	            // Print out the message, along with the message ID and sender address.
-	            snprintf(output, 128, "Message ID %d from 0x%.2X%.2X%.2X%.2X%.2X: '%s'\n\r",
+	            snprintf(output, 128, "Message ID %d from 0x%.2X%.2X%.2X%.2X%.2X: '%.2X'\n\r",
 	                    packet.payload.message.messageid,
 	                    packet.payload.message.address[0],
 	                    packet.payload.message.address[1],
 	                    packet.payload.message.address[2],
 	                    packet.payload.message.address[3],
 	                    packet.payload.message.address[4],
-	                    packet.payload.message.messagecontent);
+	                    packet.payload.message.messagecontent[13]);
 	            Serial.print(output);
 
-	            // Reply to the sender by sending an ACK packet.
-	            packet.type = ACK;
-
-	            if (Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
-	            {
-	                snprintf(output, 128, "Could not reply to sender.\n\r");
-	                Serial.print(output);
-	            }
-	            else
-	            {
-	                snprintf(output, 128, "Replied to sender.\n\r");
-	                Serial.print(output);
-	            }
+	            if((int8_t)packet.payload.message.messagecontent[13] < 0)
+	            	blink_green();
+	        	else if ((int8_t)packet.payload.message.messagecontent[15] < 0)
+	        		blink_red ();
+	        	else
+	        		blink_orange();
 	        }
 	    }
     return 0;

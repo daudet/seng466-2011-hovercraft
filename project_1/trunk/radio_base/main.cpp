@@ -19,6 +19,7 @@
 
 #include "Core/WProgram.h"
 #include "radio.h"
+#include "UART/UART.h"
 
 uint8_t rx_addr[5] = { 0xE1, 0xE1, 0xE1, 0xE1, 0xE1 };
 uint8_t tx_addr[5] = { 0xE2, 0xE2, 0xE2, 0xE2, 0xE2 };
@@ -37,7 +38,7 @@ radiopacket_t packet;
 int main()
 {
     // string buffer for printing to UART
-    char output[128];
+    //char output[128];
     sei();
     init();
 
@@ -50,7 +51,7 @@ int main()
     cli();
 
     // start the serial output module
-    Serial.begin(9600);
+    UARTinit();
 
     // initialize the radio, including the SPI module
     Radio_Init();
@@ -63,71 +64,63 @@ int main()
     // enable interrupts
     sei();
 
-    // print a message to UART to indicate that the program has started up
-    snprintf(output, 128, "Starting Remote Station\n\r");
-    Serial.print(output);
-
 	Radio_Set_Tx_Addr(tx_addr);
 	packet.type = MESSAGE;
 
-	char myMessage[13] = "Hello DEBUG!";
-
-	//copy message into the packet
-	memcpy(packet.payload.message.messagecontent, myMessage, sizeof(byte)*23);
-	memcpy(packet.payload.message.address, rx_addr, sizeof(byte)*5);
-	packet.payload.message.messageid = 1;
-
-	//send the packet to the debug station
-	if (Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
-	{
-		snprintf(output, 128, "Could not send message to debug.\n\r");
-		Serial.print(output);
-	}
-	else
-	{
-		snprintf(output, 128, "Successfully sent message to debug.\n\r");
-		Serial.print(output);
-		packet.payload.message.messageid = packet.payload.message.messageid + 1;
-	}
+	byte data[18];
 
 	for(;;){
 
-		if (rxflag)
+		//get the gamepad data
+		if(UARTreceive(data, 18)){
+			//copy message into the packet
+			memcpy(packet.payload.message.messagecontent, data, 18);
+			memcpy(packet.payload.message.address, rx_addr, 5);
+			packet.payload.message.messageid = 1;
+
+			//send the packet to the remote station; don't wait for successful transmission
+			Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
+
+		}
+
+		/*if (rxflag)
 		{
-				Serial.println("Received a packet !!!");
+				//Serial.println("Received a packet !!!");
 
 			if (Radio_Receive(&packet) != RADIO_RX_MORE_PACKETS)
 			{
 				// if there are no more packets on the radio, clear the receive flag;
 				// otherwise, we want to handle the next packet on the next loop iteration.
-				Serial.println("No more packets to receive");
+				//Serial.println("No more packets to receive");
 				rxflag = 0;
 			}
 
 			// This station is only expecting to receive MESSAGE packets.
 			if (packet.type == ACK)
 			{
-				snprintf(output, 128, "Successfully got ACK from DEBUG for message id: %d \n\r", packet.payload.ack.messageid);
-				Serial.print(output);
+				//snprintf(output, 128, "Successfully got ACK from DEBUG for message id: %d \n\r", packet.payload.ack.messageid);
+				//Serial.print(output);
 
-				delay(1000);
+				//copy message into the packet
+				memcpy(packet.payload.message.messagecontent, data, 18);
+				memcpy(packet.payload.message.address, rx_addr, 5);
 
 				//send the next packet
 				packet.type = MESSAGE;
 				packet.payload.message.messageid = packet.payload.message.messageid + 1;
 
-				if (Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
+				if(Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
 				{
-					snprintf(output, 128, "Could not send message to debug.\n\r");
-					Serial.print(output);
+					//snprintf(output, 128, "Could not send message to debug.\n\r");
+					//Serial.print(output);
 				}
 				else
 				{
-					snprintf(output, 128, "Successfully sent message to debug.\n\r");
-					Serial.print(output);
+					//snprintf(output, 128, "Successfully sent message to debug.\n\r");
+					//Serial.print(output);
 				}
 			}
-		}
+		}*/
 	}
     return 0;
 }
@@ -138,6 +131,6 @@ int main()
 void radio_rxhandler(uint8_t pipenumber)
 {
     // just set a flag and toggle an LED.  The flag is polled in the main function.
-	rxflag = 1;
+	//rxflag = 1;
 }
 
