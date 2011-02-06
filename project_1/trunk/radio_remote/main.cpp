@@ -20,6 +20,7 @@
 #include "radio.h"
 #include "Wire/Wire.h"
 #include "wiring.h"
+#include "UART/UART.h"
 
 uint8_t rx_addr[5] = { 0xE2, 0xE2, 0xE2, 0xE2, 0xE2 };
 uint8_t tx_addr[5] = { 0xE1, 0xE1, 0xE1, 0xE1, 0xE1 };
@@ -118,11 +119,20 @@ int main()
     sei();
 
     // print a message to UART to indicate that the program has started up
-    snprintf(output, 128, "Starting Remote Station\n\r");
-    Serial.print(output);
+    //snprintf(output, 128, "Starting Remote Station\n\r");
+    //Serial.print(output);
+    byte data[4];
 
 	for (;;)
 	    {
+			if(UARTreceive(data, 4)){
+				if((data[0] == 65) && (data[1] == 66) && (data[2] == 67) && (data[3] == 68)){
+					analogWrite(5, 200);
+				}
+				else
+					analogWrite(5,50);
+			}
+
 	        if (rxflag)
 	        {
 	            if (Radio_Receive(&packet) != RADIO_RX_MORE_PACKETS)
@@ -147,19 +157,22 @@ int main()
 	            //Radio_Set_Tx_Addr(packet.payload.message.address);
 
 	            // Print out the message, along with the message ID and sender address.
-	            snprintf(output, 128, "Message ID %d from 0x%.2X%.2X%.2X%.2X%.2X: '%.2X'\n\r",
+	            snprintf(output, 128, "Message ID %d from 0x%.2X%.2X%.2X%.2X%.2X INFO-> right: %.2X left: %.2X\n\r",
 	                    packet.payload.message.messageid,
 	                    packet.payload.message.address[0],
 	                    packet.payload.message.address[1],
 	                    packet.payload.message.address[2],
 	                    packet.payload.message.address[3],
 	                    packet.payload.message.address[4],
-	                    packet.payload.message.messagecontent[13]);
-	            Serial.print(output);
+	                    packet.payload.message.messagecontent[0],
+	                    packet.payload.message.messagecontent[1]);
+	            //Serial.print(output);
 
-	            if((int8_t)packet.payload.message.messagecontent[13] < 0)
+	            UARTsend(packet.payload.message.messagecontent, 4);
+
+	            if((int8_t)packet.payload.message.messagecontent[1] < 0)
 	            	blink_green();
-	        	else if ((int8_t)packet.payload.message.messagecontent[15] < 0)
+	        	else if ((int8_t)packet.payload.message.messagecontent[0] < 0)
 	        		blink_red ();
 	        	else
 	        		blink_orange();

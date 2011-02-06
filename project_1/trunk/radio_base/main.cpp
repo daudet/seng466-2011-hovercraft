@@ -68,13 +68,21 @@ int main()
 	packet.type = MESSAGE;
 
 	byte data[18];
+	byte message_content[4];
 
 	for(;;){
 
 		//get the gamepad data
 		if(UARTreceive(data, 18)){
-			//copy message into the packet
-			memcpy(packet.payload.message.messagecontent, data, 18);
+
+			//copy right analog data byte into message_content
+			message_content[0] = data[15];
+
+			//copy left analog data byte into message_content
+			message_content[1] = data[13];
+
+			//fill the packet with data
+			memcpy(packet.payload.message.messagecontent, message_content, 4);
 			memcpy(packet.payload.message.address, rx_addr, 5);
 			packet.payload.message.messageid = 1;
 
