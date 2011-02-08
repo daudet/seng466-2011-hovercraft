@@ -66,6 +66,8 @@ int main()
 			t = millis();
 		}
 		sonarUpdate();
+		output[0] = (byte) (sonar[0]/16);
+		output[1] = (byte) (sonar[1]/16);
 	}
 
     return 0;
@@ -76,8 +78,6 @@ ISR(TIMER4_CAPT_vect)
 {
   char sreg = SREG;
   sonar[currentSonar] = ICR4/64;
-  //temporary!
-  sonar[currentSonar] /= 16;
   SREG = sreg;
 }
 
