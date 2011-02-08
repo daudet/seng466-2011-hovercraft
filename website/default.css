@@ -19,6 +19,7 @@ h1, h2, h3 {
 	font-weight: normal;
 	color: #FFFFFF;
 }
+			</p>
 
 h1 {
 	letter-spacing: -1px;
@@ -382,4 +383,10 @@ html>body #footer {
 #legal a {
 	font-weight: normal;
 	color: #1B75A9;
+}
+.code{
+	border: #9f9f9f 1px solid;
+	padding: 8px;
+	background-color: #EEECEC;
+	
 }

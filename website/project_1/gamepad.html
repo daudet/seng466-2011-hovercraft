@@ -58,47 +58,40 @@ Released for free under a Creative Commons Attribution 2.5 License
 			After awhile, the python script would stop working, complaining of a memory error. After some work it was discovered that the Arduino code was printing debug message to the serial. This was causing the python script to be sending data via UART, but also receiving data via UART. If no serial messages are printed from the Arduino side, there are no longer and script crashes are memory errrors. We can only speculate there are some threading issues or memory leaks that are causing these issues. After solving that issues it has appeared that the communication from the gamepad to the Arduino was working properly and as expected.</p>
 
 			<h1 class="title">Reading Serial Data Sent Via UART"</h1>
-			<p>Now that the attached Arduino was receiving the data from the python script, the data now had to be read and interpretted by the Arduino. To do this Neil has put some basic code on his site.
-			
-			
-			<pre>
-			<?php
-			include_once '../includes/geshi.php';
-			$source='//wait until a full packet has been buffered
-				     while (Serial.available() < 20);
+			<p>Now that the attached Arduino was receiving the data from the python script, the data now had to be read and interpretted by the Arduino. To do this Neil has put some basic code on his site.</p>
 
+<div class=code>			
+<?php
+include_once '../includes/geshi.php';
+$source='//wait until a full packet has been buffered 
+while (Serial.available() < 20);
+	
+//fill the buffer with the 20 bytes received
+for (i = 0; i < 20; i++)
+	data[i] = Serial.read();';
+$geshi = new GeSHi($source, 'c');
+$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+echo $geshi->parse_code();
+?>
+</div>
+		<p>To test what input we were reading from the serial connection we used the BlinkM LED to light different colours depending on the input from the joystick. When we first ran this test we were getting some strange output. The LED would light up, for both the right and left analog joysticks when we were checking two separate bytes of data to determine which colour to light up. After a lot of digging and some monitoring using a FTDI chip that Neil gave us, we figured out that we needed to flush the serial right after we received the correct amount of data. We modified the sample code to read the 18 bytes (of useful data) and then flush the serial. After these modifications, the LED was illuminating correctly and as we had anticipated.</p>
 
-					//fill the buffer with the 20 bytes received
-					for (i = 0; i < 20; i++)
-						data[i] = Serial.read();';
-			$geshi = new GeSHi($source, 'c');
-			$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
-			echo $geshi->parse_code();
-			?>
-			</pre>
+<div class="code">			
+<?php
+include_once '../includes/geshi.php';
+$source='//wait until a full packet has been buffered
+while (Serial.available() < 18);
+//fill the buffer with the 20 bytes received
+for (i = 0; i < 20; i++)
+	data[i] = Serial.read();
+Serial.flush();';	
+$geshi = new GeSHi($source, 'c');
+$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+print $geshi->parse_code();
+?>
+</div>
 
-			To test what input we were reading from the serial connection we used the BlinkM LED to light different colours depending on the input from the joystick. When we first ran this test we were getting some strange output. The LED would light up, for both the right and left analog joysticks when we were checking two separate bytes of data to determine which colour to light up. After a lot of digging and some monitoring using a FTDI chip that Neil gave us, we figured out that we needed to flush the serial right after we received the correct amount of data. We modified the sample code to read the 18 bytes (of useful data) and then flush the serial. After these modifications, the LED was illuminating correctly and as we had anticipated.
-			
-			<pre>
-			<?php
-			include_once '../includes/geshi.php';
-			$source='//wait until a full packet has been buffered
-				    while (Serial.available() < 18);
-					
-
-					//fill the buffer with the 20 bytes received
-					for (i = 0; i < 20; i++)
-						data[i] = Serial.read();
-					
-					Serial.flush();';	
-			$geshi = new GeSHi($source, 'c');
-			$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
-			echo $geshi->parse_code();
-			?>
-			</pre>
-			</p>
-
-		</div>
+</div>
 	</div>
 	<div id="sidebar">
 		<h2>Project 1</h2>
