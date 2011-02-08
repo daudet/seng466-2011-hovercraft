@@ -10,12 +10,17 @@
 #include "avr/interrupt.h"
 #include "Motor/motor.h"
 #include "UART/UART.h"
+#include "Sonar/sonar.h"
 
 extern "C" void __cxa_pure_virtual()
 {
     cli();    // disable interrupts
     for(;;);  // do nothing until hard reset
 }
+
+unsigned int sonar[NUM_SONARS];
+char sonarState = SONAR_POWERUP;
+char currentSonar;
 
 void blink()
 {
@@ -37,6 +42,7 @@ int main()
     //blink();
 	motorinit();
 	UARTinit();
+	sonarInit();
 
     byte input[4];
     byte output[4];
@@ -45,6 +51,7 @@ int main()
 	output[2] = 67;
 	output[3] = 68;
 
+	unsigned long t = 0;
 	for(;;)
 	{
 		if(UARTreceive(input,4))
@@ -53,11 +60,24 @@ int main()
 			updateLeft((int8_t) input[1]);
 		}
 
-		delay(100);
-		UARTsend(output,4);
+		if (millis() - t > 100)
+		{
+			UARTsend(output,4);
+			t = millis();
+		}
+		sonarUpdate();
 	}
 
-    for (;;) {}
     return 0;
+}
+
+//our sonar ping has been received - save the TCNT
+ISR(TIMER4_CAPT_vect)
+{
+  char sreg = SREG;
+  sonar[currentSonar] = ICR4/64;
+  //temporary!
+  sonar[currentSonar] /= 16;
+  SREG = sreg;
 }
 
