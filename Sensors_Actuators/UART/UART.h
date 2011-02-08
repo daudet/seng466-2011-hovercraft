@@ -7,11 +7,10 @@
 
 #include "../Core/WProgram.h"
 
-#define BAUD 38400
-#define TO 400
+#define BAUD 9600
 
 void UARTinit();
 void initbuffer(byte*, byte);
-void UARTreceive(byte*, byte);
+int UARTreceive(byte*, byte);
 void UARTsend(byte*, byte);
 
