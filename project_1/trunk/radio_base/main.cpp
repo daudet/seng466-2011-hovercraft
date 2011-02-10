@@ -81,6 +81,9 @@ int main()
 			//copy left analog data byte into message_content
 			message_content[1] = data[13];
 
+			//copy emergency stop byte from button six
+			message_content[2] = data[5];
+
 			//fill the packet with data
 			memcpy(packet.payload.message.messagecontent, message_content, 4);
 			memcpy(packet.payload.message.address, rx_addr, 5);
@@ -88,7 +91,6 @@ int main()
 
 			//send the packet to the remote station; don't wait for successful transmission
 			Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-
 		}
 
 		/*if (rxflag)
