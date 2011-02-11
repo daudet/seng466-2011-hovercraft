@@ -57,7 +57,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 			<h1 class="title">Motor Driver</h1>
 			<p> The Compact L298 Motor Driver from Solarbotics was used to drive the two motors of our project. It is powered directly from our battery supply, but connected through a relay controlled by an arduino. However, the relay cannot be controlled directly since it requires too much current. Therefore, a buffering circuit must be designed. We used two transistors to create a darlington pair.</p>
 			
-			<img src="../images/relay.png" alt="Relay Circuit"/>
+			<img src="../images/relay.png" height="500" width ="600" alt="Relay Circuit"/>
 			<br/>
 			<p>Operation of the motor driver is accomplished with three pins per motor. Two of these pins define the directon of the motor, and the other is an enable pin that can be pulse width modulated for speed control. Below is the logic table for the two motors. We are using the third set of tables which uses PWM, but we aren't use the pulse-brake function.</p> 
 			
@@ -69,7 +69,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 			
 			We are using an extremely large power supply for the typical draw of this project. It is a 7.2 V battery rated at 4200mAH. This 7.2 V supply is used to directly power the motors, but this voltage must be regulated at 5 V with a LM7805 voltage regulator. Our circuit is very similar to the one pictured below. The two capacitors are used for noise suppression and are 0.1 uF each. We didn't record any noise issues, but they are there just in case. There is also a 1000 ohm resistor connected from the output to ground to maintain the minimum current for regulator operation.</p>
 
-			<img src="../images/LM7805.gif" alt="http://snesdev.antihero.org/wp-content/uploads/2008/03/lm7805.gif"/>
+			<img src="../images/lm7805.gif"/>
 		</div>
 
 		<div class="post">
