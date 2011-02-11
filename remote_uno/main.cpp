@@ -97,8 +97,8 @@ int main()
     blinkm();
 
     //output used for transistor
-    pinMode(4, OUTPUT);
-    digitalWrite(4, HIGH);
+    pinMode(5, OUTPUT);
+    digitalWrite(5, HIGH);
 
     //power on nrf24L01
     pinMode(7,OUTPUT);
@@ -187,6 +187,8 @@ int main()
 	            	digitalWrite(4, LOW);
 
 	            	for(;;){
+
+	            		digitalWrite(5, LOW);
 	            		blink_orange();
 	            		delay(100);
 	            		blink_red();
