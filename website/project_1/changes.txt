@@ -1,25 +1,26 @@
 Overview
-	- Deg
+	-Deg
+	-Movie:	David
 
 Software Environment
 	- David
 
 Electronic Components
-	-Sonar:		Deg
-	-Motor driver:	
-	-
+	-Sonar:	Deg
+	-Motor driver: Craig
+	-Power supply: Craig
+	-BlinkM: David
 
-Wired Communications
-	-
-
-Wireless Communications
-	-David 
+Communications
+	-UART: Craig
+	-Wireless: David 
 
 USB Gamepad
-	-David
+	- David
 
 Physical Layout
 	- Deg
 
 Discussion
-	-
+	-Motor deadzone: Deg
+	-Autopilot: Craig
