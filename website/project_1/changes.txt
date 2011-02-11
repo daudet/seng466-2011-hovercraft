@@ -1,0 +1,25 @@
+Overview
+	- Deg
+
+Software Environment
+	- David
+
+Electronic Components
+	-Sonar:		Deg
+	-Motor driver:	
+	-
+
+Wired Communications
+	-
+
+Wireless Communications
+	-David 
+
+USB Gamepad
+	-David
+
+Physical Layout
+	- Deg
+
+Discussion
+	-
