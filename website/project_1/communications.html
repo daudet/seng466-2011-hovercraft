@@ -83,6 +83,43 @@ Released for free under a Creative Commons Attribution 2.5 License
 			
 			It is asychronous, which means some handshaking must occur to ensure data reliability. This was designed and implemented specifically for this project. Basically, two bytes are added to every packet as a form of handshaking. In retrospect, these bytes should have been at the start and front of a packet, but are instead at the beginning of each packet.</p>
 		</div>
+			
+
+		<div class="post">
+			<h1 class="title">Reading Serial Data Sent Via UART</h1>
+			<p>Now that the attached Arduino was receiving the data from the python script, the data now had to be read and interpretted by the Arduino. To do this Neil has put some basic code on his site.</p>
+
+<div class=code>			
+<?php
+include_once '../includes/geshi.php';
+$source='//wait until a full packet has been buffered 
+while (Serial.available() < 20);
+	
+//fill the buffer with the 20 bytes received
+for (i = 0; i < 20; i++)
+	data[i] = Serial.read();';
+$geshi = new GeSHi($source, 'c');
+$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+echo $geshi->parse_code();
+?>
+</div>
+		<p>To test what input we were reading from the serial connection we used the BlinkM LED to light different colours depending on the input from the joystick. When we first ran this test we were getting some strange output. The LED would light up, for both the right and left analog joysticks when we were checking two separate bytes of data to determine which colour to light up. After a lot of digging and some monitoring using a FTDI chip that Neil gave us, we figured out that we needed to flush the serial right after we received the correct amount of data. We modified the sample code to read the 18 bytes (of useful data) and then flush the serial. After these modifications, the LED was illuminating correctly and as we had anticipated.</p>
+
+<div class="code">			
+<?php
+include_once '../includes/geshi.php';
+$source='//wait until a full packet has been buffered
+while (Serial.available() < 18);
+//fill the buffer with the 20 bytes received
+for (i = 0; i < 20; i++)
+	data[i] = Serial.read();
+Serial.flush();';	
+$geshi = new GeSHi($source, 'c');
+$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+print $geshi->parse_code();
+?>
+</div>
+
 		
 <div class=code>			
 <?php
@@ -121,10 +158,10 @@ echo $geshi->parse_code();
 <?php
 include_once '../includes/geshi.php';
 $source='if(UARTreceive(input,4))
-		{
-			updateRight((int8_t) input[0]);
-			updateLeft((int8_t) input[1]);
-		}';
+{
+  updateRight((int8_t) input[0]);
+  updateLeft((int8_t) input[1]);
+}';
 $geshi = new GeSHi($source, 'c');
 $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
@@ -134,8 +171,9 @@ echo $geshi->parse_code();
 		<p>The worst case scenario is if the start of the UART buffer contains the second preamble byte but not the first. In that case, the function is called size+2 times before a packet is correctly received.
 		
 		The preamble code was a recent addition because during one branch of our project, one arduino was sending data as fast as it could to the other arduino. This would mean that while UARTreceive is running, the buffer was actively being filled. Then, when the buffer is flushed, the start of the buffer is out of sync. This wasn't an issue before because we were sending packets every 100 ms which slow enough that the buffer was never flushed mid-packet.</p>
+  </div>
+</div>
 
-	</div>
 	<div id="sidebar">
 		<h2>Project 1</h2>
 		<a href="project1.html">Overview</a><br />
