@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>SEng 466 Project Page</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="../default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+<!-- start header -->
+
+<div id="logo">
+	<h1>
+	SEng 466 - Software for Embedded and Mechatronics Systems
+	</h1>
+</div>
+
+
+<div id="header">
+	<div id="menu">
+		<ul>
+			<li class="current_page_item"><a href="../index.html">Homepage</a></li>
+			<li><a href="project1.html">Project 1</a></li>
+			<li><a href="../project_2/project2.html">Project 2</a></li>
+			<li><a href="../project_3/project3.html">Project 3</a></li>
+			<li><a href="../contact.html">Contact</a></li>
+		</ul>
+	</div>
+</div>
+<!-- end header -->
+</div>
+<!-- start page -->
+<div id="page">
+	<!-- start content -->
+	<div id="content">
+		<div class="post">
+
+			<h1 class="title">UART</h1>
+			<p>UART is a protocol which is essentially RS232 serial. It is used for interdevice communication. For example, the Arduino uses it to communicate with the PC for debugging and programming, but it can also be used for interdevice communication (Arduino to Arduino). 
+			
+			It is asychronous, which means some handshaking must occur to ensure data reliability. This was designed and implemented specifically for this project. Basically, two bytes are added to every packet as a form of handshaking. In retrospect, these bytes should have been at the start and front of a packet, but are instead at the beginning of each packet.</p>
+
+<div class=code>			
+<?php
+include_once '../includes/geshi.php';
+$source='int UARTreceive(byte* buffer, byte size)
+{
+	if (Serial.available() >= (size+2)){
+		if (Serial.read()==PRE1){
+			if (Serial.read()==PRE2){
+				byte i;
+				for (i = 0; i < size ; i++)
+					buffer[i] = Serial.read();
+				Serial.flush();
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+void UARTsend(byte* buffer, byte size)
+{
+	byte PRE[2] = {PRE1,PRE2};
+	Serial.write(PRE,2);
+	Serial.write(buffer, size);
+}';
+$geshi = new GeSHi($source, 'c');
+$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+echo $geshi->parse_code();
+?>
+</div>
+
+		<p>The receiveing function is the most interesting. It looks for a packet of a certain size passed in the function call, and checks to see if the UART buffer contains at least that size, plus two for the preamble handshake. Then it proceeds to check if the first two bytes in the buffer are equal to the defined preamble. If they are, then it reads the expected size of the packet and stores it. Then flushes the buffer. This will ensure we get fairly new data everytime. If the preamble check fails, then it will take the failed byte out of the buffer, and return 0. This function is utilized below in the main program loop below.</p>
+
+<div class=code>			
+<?php
+include_once '../includes/geshi.php';
+$source='if(UARTreceive(input,4))
+		{
+			updateRight((int8_t) input[0]);
+			updateLeft((int8_t) input[1]);
+		}';
+$geshi = new GeSHi($source, 'c');
+$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+echo $geshi->parse_code();
+?>
+</div>
+
+		<p>The worst case scenario is if the start of the UART buffer contains the second preamble byte but not the first. In that case, the function is called size+2 times before a packet is correctly received.
+		
+		The preamble code was a recent addition because during one branch of our project, one arduino was sending data as fast as it could to the other arduino. This would mean that while UARTreceive is running, the buffer was actively being filled. Then, when the buffer is flushed, the start of the buffer is out of sync. This wasn't an issue before because we were sending packets every 100 ms which slow enough that the buffer was never flushed mid-packet.</p>
+
+
+</div>
+	</div>
+	<div id="sidebar">
+		<h2>Project 1</h2>
+		<a href="software.html">Software Environment</a><br />
+		<a href="hardware.html">Hardware Overview</a><br />
+		<a href="gamepad.html">USB PS2 Gamepad</a><br />
+		<a href="wireless.html">Wireless Radio</a><br />
+		<a href="platform.html">Platform Design</a><br />
+	</div>
+	<!-- end content -->
+	<div style="clear: both;">&nbsp;</div>
+</div>
+<!-- end page -->
+</body>
+</html>
