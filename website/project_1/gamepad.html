@@ -46,14 +46,14 @@ Released for free under a Creative Commons Attribution 2.5 License
 		
 			<img src="../images/gamepad.jpg" height="200" width="250"alt="Logitech PS2 USB gamepad"/>
 			
-			<h1 class="title">Python Script for Reading Gamepad Events</h1>
+			<h2>Python Script for Reading Gamepad Events</h2>
 			<p>When given the USB gamepad with the other project supplies we were informed that someone from a previous class had written a script to read info from it. The script was written in Python and used some Python modules to grab the data sent over the USB controller and send it via UART to the Arduino board. 
 			
 			To use the script, pygame and pySerial are required on the computer that will be connected to the Arduino board. It was recommended that we use the lab machines to connect the gamepad as pygame and pySerial are already installed. There is also a requirement of a joystick driver which Windows already has built into the operating system. 
 			
 			We got the source files from the lab usb drive and began examining the code. Neil had told us that we didn't need to understand the code as it should just work when the gamepad is plugged in. There is also a config file "globalConfig.py" which need to be modified for the desired baud rate and serial port number of the connected Arduino.We set the debug flag on the python script and launched it. Sure enough gamepad values were printed to the terminal and everything seemed to be working.</p> 
 			
-			<h1 class="title">Problems with the Script</h1>
+			<h2>Problems with the Script</h2>
 			<p>
 			After awhile, the python script would stop working, complaining of a memory error. After some work it was discovered that the Arduino code was printing debug message to the serial. This was causing the python script to be sending data via UART, but also receiving data via UART. If no serial messages are printed from the Arduino side, there are no longer and script crashes are memory errrors. We can only speculate there are some threading issues or memory leaks that are causing these issues. After solving that issues it has appeared that the communication from the gamepad to the Arduino was working properly and as expected.</p>
 

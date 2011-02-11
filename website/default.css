@@ -227,6 +227,7 @@ input, textarea, select {
 .post h2 {
 	width: 520px;
 	padding: 0px 0 0 0px;
+	padding-bottom: 5px;
 	font-size: 20px;
 	color: #28313A; 
 }
