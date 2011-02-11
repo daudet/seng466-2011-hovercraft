@@ -65,7 +65,7 @@ $source='Wire.begin();
 	Wire.send(0xff);
 	Wire.send(0x66);
 	Wire.send(0x00);
-	Wire.endTransmission();
+	Wire.endTransmission();';
 $geshi = new GeSHi($source, 'c');
 $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
