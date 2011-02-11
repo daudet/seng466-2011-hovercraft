@@ -54,7 +54,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 			<p>The sonars are MaxBotix LV-MaxSonar-EZ1 ultrasonic rangefinders. Once powered with 5V, they can send a single ping by pulling a signal line low for 30 uSec. An output pin will remain high until the ping is received, or it times out after 50ms. The time is divided by 147uSec to return a distance in inches. The maximum resolution of the sonar is 1".</p>
 			<p>The input capture pin of Timer4 in the Seeeduino Mega was used to sample the sonar. When the ping was triggered, a falling-edge interrupt was set for ICP4. This yields extremely precise timing capabilities and does not interfere with other code on the Mega. A seperate trigger signal is needed for each sonar but all sonar outputs are connected via diodes to the same input pin. The connection diagram is shown below. </p>
 			<img src="../images/sonar_schematic.png" alt="Sonar connection schematic" />
-			
+			<br />
 			
 			<h1 class="title">Motor Driver</h1>
 			<p> The Compact L298 Motor Driver from Solarbotics was used to drive the two motors of our project. It is powered directly from our battery supply, but connected through a relay controlled by an arduino. However, the relay cannot be controlled directly since it requires too much current. Therefore, a buffering circuit must be designed. We used two transistors to create a darlington pair.</p>
