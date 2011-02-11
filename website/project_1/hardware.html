@@ -47,7 +47,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 
 			<h1 class="title">Arduino Hardware</h1>
 			<img src="../images/ArduinoUnoFront.jpg"/>
-			<p>Two <a href="http://arduino.cc/en/Main/ArduinoBoardUno">arduino UNOs</a> were provided to our group. These boards provide a USB-serial chip, voltage regulation, and breaks out the pins of an Atmel ATmega328.</p>
+			<p>Two <a href="http://arduino.cc/en/Main/ArduinoBoardUno">Arduino UNOs</a> were provided to our group. These boards provide a USB-serial chip, voltage regulation, and breaks out the pins of an Atmel ATmega328.</p>
 			<img src="../images/seeeduino.jpg"/>
 			<p>One <a href="http://www.seeedstudio.com/depot/seeeduino-mega-p-717.html?cPath=132_133">Seeeduino Mega</a> was provided. The Seeeduino is a clone of the Arduino Mega, but breaks out more pins of the Atmel ATmega1280.</p>
 			<p>Both controllers operate at a maximum 16MHz at 5V. The Mega can operate from 3.3V at reduced clock speeds, but this has not been necessary to change. Since the main difference in controllers is the pin count, the UNOs were used as radio transceivers and the Mega was reserved for hovercraft sensors and actuators.</p>
@@ -59,11 +59,11 @@ Released for free under a Creative Commons Attribution 2.5 License
 			<br />
 			
 			<h1 class="title">Motor Driver</h1>
-			<p> The Compact L298 Motor Driver from Solarbotics was used to drive the two motors of our project. It is powered directly from our battery supply, but connected through a relay controlled by an arduino. However, the relay cannot be controlled directly since it requires too much current. Therefore, a buffering circuit must be designed. We used two transistors to create a darlington pair.</p>
+			<p> The Compact L298 Motor Driver from Solarbotics was used to drive the two motors of our project. It is powered directly from our battery supply, but connected through a relay controlled by an Arduino. However, the relay cannot be controlled directly since it requires too much current. Therefore, a buffering circuit must be designed. We used two transistors to create a darlington pair.</p>
 			
 			<img src="../images/relay.png" height="500" width ="600" alt="Relay Circuit"/>
 			<br/>
-			<p>Operation of the motor driver is accomplished with three pins per motor. Two of these pins define the directon of the motor, and the other is an enable pin that can be pulse width modulated for speed control. Below is the logic table for the two motors. We are using the third set of tables which uses PWM, but we aren't use the pulse-brake function.</p> 
+			<p>Operation of the motor driver is accomplished with three pins per motor. Two of these pins define the directon of the motor, and the other is an enable pin that can be pulse width modulated for speed control. Below is the logic table for the two motors. We are using the third set of tables which uses PWM, but we aren't using the pulse-brake function.</p> 
 			
 			<img src="../images/logictable.png" alt="L298 Logic Table"/>
 			<br/>	
@@ -97,7 +97,7 @@ print $geshi->parse_code();
 ?>
 </div>
 		      <br/>
-		      <p>The above code sends the character 'o' to stop any light scripts running on the device, the character 'n' followed by RGB values to tell the device to switch immediately to the given RGB color. We found that if we didn't send the 'stop script' command, occaisionally the LED would revert to the last programmed light script, producing unpredictable behavior.</p>
+		      <p>The above code sends the character 'o' to stop any light scripts running on the device, the character 'n' followed by RGB values tell the device to switch immediately to the given RGB color. We found that if we didn't send the 'stop script' command, occaisionally the LED would revert to the last programmed light script, producing unpredictable behavior.</p>
 	      </div>
 
 

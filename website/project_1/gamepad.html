@@ -51,7 +51,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 
 			To use the script, pygame and pySerial are required on the computer that will be connected to the Arduino board. It was recommended that we use the lab machines to connect the gamepad as pygame and pySerial are already installed. There is also a requirement of a joystick driver which Windows already has built into the operating system.
 
-			We got the source files from the lab usb drive and began examining the code. Neil had told us that we didn't need to understand the code as it should just work when the gamepad is plugged in. There is also a config file "globalConfig.py" which need to be modified for the desired baud rate and serial port number of the connected Arduino.We set the debug flag on the python script and launched it. Sure enough gamepad values were printed to the terminal and everything seemed to be working.</p>
+			We got the source files from the lab usb drive and began examining the code. Neil had told us that we didn't need to understand the code as it should just work when the gamepad is plugged in. There is also a config file "globalConfig.py" which needed to be modified for the desired baud rate and serial port number of the connected Arduino. We set the debug flag on the python script and launched it. Sure enough gamepad values were printed to the terminal and everything seemed to be working.</p>
 
 			<h2>Problems with the Script</h2>
 			<p>
@@ -60,19 +60,20 @@ Released for free under a Creative Commons Attribution 2.5 License
 			<h2>Reading Serial Data Sent Via UART</h2>
 			<p>Now that the attached Arduino was receiving the data from the python script, the data now had to be read and interpretted by the Arduino. To do this Neil has put some basic code on his site.</p>
 
-			<div class=code>
-			<?php
-			include_once '../includes/geshi.php';
-			$source='//wait until a full packet has been buffered
-			while (Serial.available() < 20);
+<div class=code>
+<?php
+include_once '../includes/geshi.php';
+$source='
+//wait until a full packet has been buffered
+while (Serial.available() < 20);
 
-			//fill the buffer with the 20 bytes received
-			for (i = 0; i < 20; i++)
-				data[i] = Serial.read();';
-			$geshi = new GeSHi($source, 'c');
-			echo $geshi->parse_code();
-			?>
-			</div>
+//fill the buffer with the 20 bytes received
+	for (i = 0; i < 20; i++)
+		data[i] = Serial.read();';
+$geshi = new GeSHi($source, 'c');
+echo $geshi->parse_code();
+?>
+</div>
 			<br/>
 			<p>To test what input we were reading from the serial connection we used the BlinkM LED to light different colours depending on the input from the joystick. When we first ran this test we were getting some strange output. The LED would light up, for both the right and left analog joysticks when we were checking two separate bytes of data to determine which colour to light up. After a lot of digging and some monitoring using a FTDI chip that Neil gave us, we figured out that we needed to flush the serial right after we received the correct amount of data. We modified the sample code to read the 18 bytes (of useful data) and then flush the serial. After these modifications, the LED was illuminating correctly and as we had anticipated.</p>
 
