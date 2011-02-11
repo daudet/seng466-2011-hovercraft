@@ -100,7 +100,6 @@ while (Serial.available() < 20);
 for (i = 0; i < 20; i++)
 	data[i] = Serial.read();';
 $geshi = new GeSHi($source, 'c');
-$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
 ?>
 </div>
@@ -117,7 +116,6 @@ for (i = 0; i < 20; i++)
 	data[i] = Serial.read();
 Serial.flush();';	
 $geshi = new GeSHi($source, 'c');
-$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 print $geshi->parse_code();
 ?>
 </div>
@@ -149,7 +147,6 @@ void UARTsend(byte* buffer, byte size)
 	Serial.write(buffer, size);
 }';
 $geshi = new GeSHi($source, 'c');
-$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
 ?>
 </div>
@@ -165,7 +162,6 @@ $source='if(UARTreceive(input,4))
   updateLeft((int8_t) input[1]);
 }';
 $geshi = new GeSHi($source, 'c');
-$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
 ?>
 </div>

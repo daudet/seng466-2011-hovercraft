@@ -91,7 +91,6 @@ Wire.send(0x66);
 Wire.send(0x00);
 Wire.endTransmission();';	
 $geshi = new GeSHi($source, 'c');
-$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 print $geshi->parse_code();
 ?>
 </div>
