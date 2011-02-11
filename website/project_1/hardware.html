@@ -47,8 +47,10 @@ Released for free under a Creative Commons Attribution 2.5 License
 
 			<h1 class="title">Arduino Hardware</h1>
 			<img src="../images/ArduinoUnoFront.jpg"/>
+			<p>Two <a href="http://arduino.cc/en/Main/ArduinoBoardUno">arduino UNOs</a> were provided to our group. These boards provide a USB-serial chip, voltage regulation, and breaks out the pins of an Atmel ATmega328.</p>
 			<img src="../images/seeeduino.jpg"/>
-
+			<p>One <a href="http://www.seeedstudio.com/depot/seeeduino-mega-p-717.html?cPath=132_133">Seeeduino Mega</a> was provided. The Seeeduino is a clone of the Arduino Mega, but breaks out more pins of the Atmel ATmega1280.</p>
+			<p>Both controllers operate at a maximum 16MHz at 5V. The Mega can operate from 3.3V at reduced clock speeds, but this has not been necessary to change. Since the main difference in controllers is the pin count, the UNOs were used as radio transceivers and the Mega was reserved for hovercraft sensors and actuators.</p>
 			<h1 class="title">Sonar</h1>
 			<img src="../images/sonar.jpg"/>
 			<p>The sonars are MaxBotix LV-MaxSonar-EZ1 ultrasonic rangefinders. Once powered with 5V, they can send a single ping by pulling a signal line low for 30 uSec. An output pin will remain high until the ping is received, or it times out after 50ms. The time is divided by 147uSec to return a distance in inches. The maximum resolution of the sonar is 1".</p>
