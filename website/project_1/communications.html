@@ -43,11 +43,12 @@ Released for free under a Creative Commons Attribution 2.5 License
 	<div id="content">
 		<div class="post">
 
-		<h1 class="title">Wireless Radios</h1>
+		<h1 class="title">Communications</h1>
 			<img src="../images/base_and_remote.jpg"/>
-		
+			<p>This section outlines the main methods of communication that we are using in this project. We are using wireless communication between both of the Arduino Uno boards. We are using UART for communication between the basestation and the computer as well as between the remote Uno and the remote Mega board. Below is a brief introduction to programming the wireless radios and using UART.</p>
+
 		<h1 class="title">Nordic Semi nRF24L01</h1>
-			<p>We are using a 2.4 GHz wireless radio that has been used by passed classes with success. We are going to use the radios to create a base station as well as a remote station that will create a bidirectional link between our platform and the desktop computer. Neil has developped the driver for this radio and has documentation and sample code on the lab website. Initially Neil was worried that the code may not be compatible with the newer Uno boards. He told us that if his code didn't work there was another library available on the Arduino Playground we could try at our own risk.</p>
+			<p>We are using a 2.4 GHz wireless radio that has been used by passed classes with success. We are going to use the radios to create a base station as well as a remote station that will create a bidirectional link between our platform and the desktop computer. Neil has developped the driver for this radio and has documentation and sample code on the lab website. Initially Neil was worried that the code may not be compatible with the newer Uno boards. He told us that if his code didn't work there was another library available <a href="http://www.arduino.cc/playground/InterfacingWithHardware/Nrf24L01">(Mirf)</a> on the Arduino Playground we could try at our own risk.</p>
 		</div>
 
 		<div class="post">
@@ -73,7 +74,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 	
 		<div class="post">
 			<h1 class="title">Wireless Control of the Platform Motors</h1>
-			<p>to do</p>
+			<p>To control the platform motors we are using the data from the two analog joysticks of the gamepad. Since the vertical axis of each of these joysticks is represented by a byte we can use this value (between -100 and 99) to adjust the PWM signal to the motor driver which will adjust the duty cycle of the DC motors. Since we are also sending an emergency stop command we have decided that our wireless message payload will be 4 bytes in size. This will allow for two bytes for the joystick position and one other byte for the button press for the emergency button. To modify this payload is quite easy using Neil's radio driver as his message size is 128 bytes, but can be less than that value.</p>
 		</div>
 		
 		
@@ -103,6 +104,7 @@ $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
 ?>
 </div>
+<br/>
 		<p>To test what input we were reading from the serial connection we used the BlinkM LED to light different colours depending on the input from the joystick. When we first ran this test we were getting some strange output. The LED would light up, for both the right and left analog joysticks when we were checking two separate bytes of data to determine which colour to light up. After a lot of digging and some monitoring using a FTDI chip that Neil gave us, we figured out that we needed to flush the serial right after we received the correct amount of data. We modified the sample code to read the 18 bytes (of useful data) and then flush the serial. After these modifications, the LED was illuminating correctly and as we had anticipated.</p>
 
 <div class="code">			
@@ -119,8 +121,8 @@ $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 print $geshi->parse_code();
 ?>
 </div>
-
-		
+<br/>
+<br/>		
 <div class=code>			
 <?php
 include_once '../includes/geshi.php';
@@ -151,7 +153,7 @@ $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
 ?>
 </div>
-
+<br/>
 		<p>The receiveing function is the most interesting. It looks for a packet of a certain size passed in the function call, and checks to see if the UART buffer contains at least that size, plus two for the preamble handshake. Then it proceeds to check if the first two bytes in the buffer are equal to the defined preamble. If they are, then it reads the expected size of the packet and stores it. Then flushes the buffer. This will ensure we get fairly new data everytime. If the preamble check fails, then it will take the failed byte out of the buffer, and return 0. This function is utilized below in the main program loop below.</p>
 
 <div class=code>			
@@ -167,7 +169,7 @@ $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
 echo $geshi->parse_code();
 ?>
 </div>
-
+<br/>
 		<p>The worst case scenario is if the start of the UART buffer contains the second preamble byte but not the first. In that case, the function is called size+2 times before a packet is correctly received.
 		
 		The preamble code was a recent addition because during one branch of our project, one arduino was sending data as fast as it could to the other arduino. This would mean that while UARTreceive is running, the buffer was actively being filled. Then, when the buffer is flushed, the start of the buffer is out of sync. This wasn't an issue before because we were sending packets every 100 ms which slow enough that the buffer was never flushed mid-packet.</p>
