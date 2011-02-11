@@ -220,13 +220,14 @@ input, textarea, select {
 	padding: 0px 0 0 0px;
 	background: url(images/img08.jpg) no-repeat left top;
 	font-size: 24px;
+	font-weight: bold;
 	color: #28313A; 
 }
 
 .post h2 {
 	width: 520px;
 	padding: 0px 0 0 0px;
-	font-size: 22px;
+	font-size: 20px;
 	color: #28313A; 
 }
 

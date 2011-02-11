@@ -52,28 +52,28 @@ Released for free under a Creative Commons Attribution 2.5 License
 		</div>
 
 		<div class="post">
-			<h1 class="title">Initial Testing</h1>
+			<h2>Initial Testing</h2>
 			<p>When we first got our hands on the radios we decided to use the code on the Arduin Playground. This was partly due to the fact that we weren't sure if Neil's driver would work and partly due to the limited setup needed to run the sample code that came with the library. The library is called Mirf and comes with an update SPI folder containing some updated SPI code not found in the latest release of the Arduino IDE. We used some initial client/server code that would basically just send a ping from one board to another and print out the time it took to get a reply.</p>
 		</div>
 
 		<div class="post">
-			<h1 class="title">Wireless Gamepad Data with Mirf Library</h1>
+			<h2>Wireless Gamepad Data with Mirf Library</h2>
 			<p>To take this a step further we wanted to modify this basic code and start sending the gamepad data from one UNO to the other. We bread-boarded the two UNO boards with the radios and connected one to the lab desktop PC and connected the BlinkM LED to the other one. The remote station would be the one with the LED and would eventually be on the platform used to send control signals to the MEGA board. We reused our code that we used to read the gamepad data over UART from the python script, but placed it in a library we called UART with some other helpful UART functions.</p>
 			<p>We modified the code and had the LED light up on the remote station signifying that we were receiving the correct byte of information from the base station. The only issue was that the LED was not staying lit, but flashing on and off. We spent a lot of time debugging the code trying to fix any timing issues (using a call to delay()). We couldn't get the code working how we needed it to work and made a decision to look into using Neil's code. There is a lot of documentation for his driver and we talked to other groups who seem to be using the radios with his code without issue.</p>
 		</div>
 
 		<div class="post">
-			<h1 class="title">Neil's Radio Driver</h1>
+			<h2>Neil's Radio Driver</h2>
 			<p>Neil setup a radio debug station that could be used to test if our radio code was working correctly with his driver. He setup a laptop and an Arduino board with a radio that ran some code that would receive messages and print them to a serial terminal. After a few hours of reading his documentation we were able to get one Uno board to send some debug packets to the debug station and have them output on the serial terminal. After managing this all we had to do was write some similar receiving code on the other Uno to test that we could communicate between both Uno boards.</p>
 		</div>
 
 		<div class="post">
-			<h1 class="title">Wireless Gamepad Data with Neil's Driver</h1>
+			<h2>Wireless Gamepad Data with Neil's Driver</h2>
 			<p>After successfully getting two Uno to communicate wirelessly we now decided to attempt sending gamepad data again over the wireless connection. Using similar code structure to the code using the Mirf library we modified the remote station to light the LED red when the right analog stick was moved upwardson the gamepad and green when the left analog stick was moved upwards. This was working, but there still seemed to be some timing issues as the LED would flash repeatedly even if the joystick remained in an upward position. After printing the received data to serial we realized that the data signifying an upward movement of the analog stick was being received, but zeros were injected into the packet at specific intervals, causing the LED to turn off then on again when the correct data was received. We discovered that this was due to some code written in our UART library. Instead of waiting until for 18 bytes to be received by the base station, it was waiting for strictly more than 18 bytes of data. By changing this condition to less than or equal we solved the problem.</p>
 		</div>
 	
 		<div class="post">
-			<h1 class="title">Wireless Control of the Platform Motors</h1>
+			<h2>Wireless Control of the Platform Motors</h2>
 			<p>To control the platform motors we are using the data from the two analog joysticks of the gamepad. Since the vertical axis of each of these joysticks is represented by a byte we can use this value (between -100 and 99) to adjust the PWM signal to the motor driver which will adjust the duty cycle of the DC motors. Since we are also sending an emergency stop command we have decided that our wireless message payload will be 4 bytes in size. This will allow for two bytes for the joystick position and one other byte for the button press for the emergency button. To modify this payload is quite easy using Neil's radio driver as his message size is 128 bytes, but can be less than that value.</p>
 		</div>
 		
@@ -87,7 +87,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 			
 
 		<div class="post">
-			<h1 class="title">Reading Serial Data Sent Via UART</h1>
+			<h2>Reading Serial Data Sent Via UART</h2>
 			<p>Now that the attached Arduino was receiving the data from the python script, the data now had to be read and interpretted by the Arduino. To do this Neil has put some basic code on his site.</p>
 
 <div class=code>			
