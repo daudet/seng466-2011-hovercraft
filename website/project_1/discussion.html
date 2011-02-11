@@ -42,7 +42,9 @@ Released for free under a Creative Commons Attribution 2.5 License
 	<!-- start content -->
 	<div id="content">
 		<div class="post">
-
+			<h1 class="title">Discussion</h1>
+			<p>This section discusses some of our outstanding issues, and future development plans.
+			</p>
 			<h1 class="title">Motor Deadzone</h1>
 			<p>Two future improvements were noticed during motor characterization - arduino reduces "analog" (PWM) fidelity to 8-bit at 500Hz, and the motors have unique dead zones. The motors and fans will begin turning once a certain threshold PWM is reached to overcome motor 'stickiness' and inertia. Experimentally we found our motors begin turning at a duty cycle of around 160/255 at a frequency of 32kHz. We recommend using the Arduino <a href="http://www.arduino.cc/en/Reference/Map">map function</a> to take the input motor command (between 1 and 99) and map it to a PWM duty cycle between the minimum threshold and 255. This abstraction will take place on the Mega, so the existing communications will remain the same. This will also simplify the automatic control loop.
 			</p>
