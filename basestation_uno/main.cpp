@@ -93,6 +93,28 @@ int main()
 			Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
 		}
 
+		/* We can use something like this to get wii gamepad info:
+		//requires the Wire (I2C) library + WiiClassic library
+		if (gamepadReceive()) {
+			//right analog data byte
+			message_content[0] = map(data, 1, 28, -99, 99);
+
+			//left analog data byte
+			message_content[1] = map(data, 6, 59, -99, 99);
+
+			//emergency stop byte from button six
+			message_content[2] = data;
+
+			//fill the packet with data
+			memcpy(packet.payload.message.messagecontent, message_content, 4);
+			memcpy(packet.payload.message.address, rx_addr, 5);
+			packet.payload.message.messageid = 1;
+
+			//send the packet to the remote station; don't wait for successful transmission
+			Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
+		}
+		*/
+		
 		/*if (rxflag)
 		{
 				//Serial.println("Received a packet !!!");
