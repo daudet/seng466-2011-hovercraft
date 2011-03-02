@@ -42,13 +42,13 @@ void updateRight(int8_t value)
 	if(value < 0){ //UP
 		digitalWrite(L3, LOW);
 		digitalWrite(L4, HIGH);
-		analogWrite(E3_4, abs(value)<<1);
+		analogWrite(E3_4, map(abs(value),1,128,DEADZONE,255));
 		digitalWrite(13,HIGH);
 	}
 	else if(value > 0){ //DOWN
 		digitalWrite(L3, HIGH);
 		digitalWrite(L4, LOW);
-		analogWrite(E3_4, abs(value)<<1);
+		analogWrite(E3_4, map(abs(value),1,128,DEADZONE,255));
 		digitalWrite(13,LOW);
 	}
 	else{
@@ -63,13 +63,13 @@ void updateLeft(int8_t value)
 	if(value < 0){ //UP
 		digitalWrite(L1, LOW);
 		digitalWrite(L2, HIGH);
-		analogWrite(E1_2, abs(value)<<1);
+		analogWrite(E1_2,  map(abs(value),1,128,DEADZONE,255));
 		digitalWrite(13,HIGH);
 	}
 	else if(value > 0){ //DOWN
 		digitalWrite(L1, HIGH);
 		digitalWrite(L2, LOW);
-		analogWrite(E1_2, abs(value)<<1);
+		analogWrite(E1_2,  map(abs(value),1,128,DEADZONE,255));
 		digitalWrite(13,LOW);
 	}
 	else{

@@ -51,13 +51,37 @@ int main()
 	output[2] = 67;
 	output[3] = 68;
 
-	unsigned long t = 0;
+	unsigned long t;
+	byte Lflag; //1 if liftup 0 if liftdown
+	byte Lval1=255;
+	byte Lval2=255;
+
 	for(;;)
 	{
 		if(UARTreceive(input,4))
 		{
 			updateRight((int8_t) input[0]);
 			updateLeft((int8_t) input[1]);
+
+			if (input[2]==1)
+				Lflag=1; //lift up
+			else if (input[3]==1)
+				Lflag=0; //lift down
+
+			if (Lflag) { //lifting up
+				if (Lval1>LMAX1)
+					Lval1-=LSTEP;
+				if (Lval2>LMAX2)
+					Lval2-=LSTEP;
+			}
+			else { //lifting down
+				if (Lval1<255)
+					Lval1+=LSTEP;
+				if (Lval2<255)
+					Lval2+=LSTEP;
+			}
+			analogWrite(LE1,Lval1); //lift motor 1
+			analogWrite(LE2,Lval2); //lift motor 2
 		}
 
 		if (millis() - t > 100)
