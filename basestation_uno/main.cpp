@@ -20,12 +20,16 @@
 #include "Core/WProgram.h"
 #include "radio.h"
 #include "UART/UART.h"
+#include "wii_controller/WiiClassic.h"
+#include "Wire/Wire.h"
 
 uint8_t rx_addr[5] = { 0xE1, 0xE1, 0xE1, 0xE1, 0xE1 };
 uint8_t tx_addr[5] = { 0xE2, 0xE2, 0xE2, 0xE2, 0xE2 };
 
 // this has to be volatile because it's used in an ISR (radio_rxhandler).
 volatile uint8_t rxflag = 0;
+
+int gamepadReceive(byte*, WiiClassic);
 
 extern "C" void __cxa_pure_virtual()
 {
@@ -37,10 +41,20 @@ radiopacket_t packet;
 
 int main()
 {
+
+	sei();
+	init();
+
+	//instantiate the WiiClassic object
+	WiiClassic wiiClassy = WiiClassic();
+
+	Wire.begin();
+	Serial.begin(9600);
+	wiiClassy.begin();
+	wiiClassy.update();
+
     // string buffer for printing to UART
-    //char output[128];
-    sei();
-    init();
+    char output[128];
 
     //power on nrf24L01
     pinMode(7,OUTPUT);
@@ -49,9 +63,6 @@ int main()
 
     // disable interrupts during setup
     cli();
-
-    // start the serial output module
-    UARTinit();
 
     // initialize the radio, including the SPI module
     Radio_Init();
@@ -67,55 +78,22 @@ int main()
 	Radio_Set_Tx_Addr(tx_addr);
 	packet.type = MESSAGE;
 
-	byte data[18];
-	byte message_content[4];
+	byte gamepadData[5];
 
 	for(;;){
 
-		//get the gamepad data
-		if(UARTreceive(data, 18)){
+		gamepadReceive(gamepadData, wiiClassy);
 
-			//copy right analog data byte into message_content
-			message_content[0] = data[15];
+		//fill the packet with data
+		memcpy(packet.payload.message.messagecontent, gamepadData, 5);
+		memcpy(packet.payload.message.address, rx_addr, 5);
+		packet.payload.message.messageid = 1;
 
-			//copy left analog data byte into message_content
-			message_content[1] = data[13];
-
-			//copy emergency stop byte from button six
-			message_content[2] = data[5];
-
-			//fill the packet with data
-			memcpy(packet.payload.message.messagecontent, message_content, 4);
-			memcpy(packet.payload.message.address, rx_addr, 5);
-			packet.payload.message.messageid = 1;
-
-			//send the packet to the remote station; don't wait for successful transmission
-			Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-		}
-
-		/* We can use something like this to get wii gamepad info:
-		//requires the Wire (I2C) library + WiiClassic library
-		if (gamepadReceive()) {
-			//right analog data byte
-			message_content[0] = map(data, 1, 28, -99, 99);
-
-			//left analog data byte
-			message_content[1] = map(data, 6, 59, -99, 99);
-
-			//emergency stop byte from button six
-			message_content[2] = data;
-
-			//fill the packet with data
-			memcpy(packet.payload.message.messagecontent, message_content, 4);
-			memcpy(packet.payload.message.address, rx_addr, 5);
-			packet.payload.message.messageid = 1;
-
-			//send the packet to the remote station; don't wait for successful transmission
-			Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-		}
-		*/
+		//send the packet to the remote station; don't wait for successful transmission
+		Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
 		
-		/*if (rxflag)
+		/* to be implemented for debug from remote uno board
+		if (rxflag)
 		{
 				//Serial.println("Received a packet !!!");
 
@@ -165,4 +143,66 @@ void radio_rxhandler(uint8_t pipenumber)
     // just set a flag and toggle an LED.  The flag is polled in the main function.
 	//rxflag = 1;
 }
+/*
+ * gamepadData is structured as follows:
+ * gamepadData[0] = right analog joystick value from -127 --> 127
+ * gamepadData[1] = left analog joystick value from -127 --> 127
+ * gamepadData[2] = emergency stop button (right shoulder button) either 0 or 1
+ * gamepadData[3] = lifting motor actuator (right Z button) either 0 or 1
+ * gamepadData[4] = lifting motor actuator (left Z button) either 0 or 1
+ */
 
+int gamepadReceive(byte* gamepadData, WiiClassic wiiClassy){
+
+	delay(1000);
+	wiiClassy.update();
+
+	//copy right analog data byte into message_content
+	Serial.print("right stick:");
+	gamepadData[0] = (byte)(map(wiiClassy.rightStickY(), 1, 28, -127, 127));
+	Serial.println((int8_t)gamepadData[0]);
+
+	//copy left analog data byte into message_content
+	Serial.print("left stick:");
+	gamepadData[1] = (byte)(map(wiiClassy.leftStickY(), 5, 59, -127, 127));
+	Serial.println((int8_t)gamepadData[1]);
+
+	Serial.print("right shoulder:");
+
+	//copy emergency stop byte from button six
+	if(wiiClassy.rightShoulderPressed()){
+		gamepadData[2] = 1;
+		Serial.println("1");
+	}
+	else{
+		gamepadData[2] = 0;
+		Serial.println("0");
+	}
+
+	Serial.print("right Z button:");
+
+	//check for right Z button pressed
+
+	if(wiiClassy.rzPressed()){
+		gamepadData[3] = 1;
+		Serial.println("1");
+	}
+	else{
+		gamepadData[3] = 0;
+		Serial.println("0");
+	}
+
+	Serial.print("left Z button:");
+
+	//check for left Z button pressed
+	if(wiiClassy.lzPressed()){
+		gamepadData[4] = 1;
+		Serial.println("1");
+	}
+	else{
+		gamepadData[4] = 0;
+		Serial.println("0");
+	}
+
+	return 1;
+}
