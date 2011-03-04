@@ -56,6 +56,7 @@ int main()
 	byte Lval1=255;
 	byte Lval2=255;
 
+
 	for(;;)
 	{
 		if(UARTreceive(input,4))

@@ -54,7 +54,7 @@ int main()
 	wiiClassy.update();
 
     // string buffer for printing to UART
-    char output[128];
+    //char output[128];
 
     //power on nrf24L01
     pinMode(7,OUTPUT);
@@ -91,25 +91,24 @@ int main()
 
 		//send the packet to the remote station; don't wait for successful transmission
 		Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-		
-		/* to be implemented for debug from remote uno board
+		/*
 		if (rxflag)
 		{
-				//Serial.println("Received a packet !!!");
+				Serial.println("Received a packet !!!");
 
 			if (Radio_Receive(&packet) != RADIO_RX_MORE_PACKETS)
 			{
 				// if there are no more packets on the radio, clear the receive flag;
 				// otherwise, we want to handle the next packet on the next loop iteration.
-				//Serial.println("No more packets to receive");
+				Serial.println("No more packets to receive");
 				rxflag = 0;
 			}
 
 			// This station is only expecting to receive MESSAGE packets.
 			if (packet.type == ACK)
 			{
-				//snprintf(output, 128, "Successfully got ACK from DEBUG for message id: %d \n\r", packet.payload.ack.messageid);
-				//Serial.print(output);
+				snprintf(output, 128, "Successfully got ACK from DEBUG for message id: %d \n\r", packet.payload.ack.messageid);
+				Serial.print(output);
 
 				//copy message into the packet
 				memcpy(packet.payload.message.messagecontent, data, 18);
@@ -121,13 +120,13 @@ int main()
 
 				if(Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
 				{
-					//snprintf(output, 128, "Could not send message to debug.\n\r");
-					//Serial.print(output);
+					snprintf(output, 128, "Could not send message to debug.\n\r");
+					Serial.print(output);
 				}
 				else
 				{
-					//snprintf(output, 128, "Successfully sent message to debug.\n\r");
-					//Serial.print(output);
+					snprintf(output, 128, "Successfully sent message to debug.\n\r");
+					Serial.print(output);
 				}
 			}
 		}*/
@@ -147,30 +146,31 @@ void radio_rxhandler(uint8_t pipenumber)
  * gamepadData is structured as follows:
  * gamepadData[0] = right analog joystick value from -127 --> 127
  * gamepadData[1] = left analog joystick value from -127 --> 127
- * gamepadData[2] = emergency stop button (right shoulder button) either 0 or 1
- * gamepadData[3] = lifting motor actuator (right Z button) either 0 or 1
- * gamepadData[4] = lifting motor actuator (left Z button) either 0 or 1
+ * gamepadData[2] = lifting motor actuator (right Z button) either 0 or 1
+ * gamepadData[3] = lifting motor actuator (left Z button) either 0 or 1
+ * gamepadData[4] = emergency stop button (right shoulder button) either 0 or 1
  */
 
 int gamepadReceive(byte* gamepadData, WiiClassic wiiClassy){
 
-	delay(1000);
+	delay(50);
 	wiiClassy.update();
 
 	//copy right analog data byte into message_content
 	Serial.print("right stick:");
-	gamepadData[0] = (byte)(map(wiiClassy.rightStickY(), 1, 28, -127, 127));
+	gamepadData[0] = (byte)(constrain((map(wiiClassy.rightStickY(), 1, 28, -127, 127) - 4), -127, 128));
 	Serial.println((int8_t)gamepadData[0]);
 
 	//copy left analog data byte into message_content
 	Serial.print("left stick:");
-	gamepadData[1] = (byte)(map(wiiClassy.leftStickY(), 5, 59, -127, 127));
+	gamepadData[1] = (byte)(constrain(map(wiiClassy.leftStickY(), 5, 59, -127, 127), -127, 127));
 	Serial.println((int8_t)gamepadData[1]);
 
-	Serial.print("right shoulder:");
+	Serial.print("right Z button:");
 
-	//copy emergency stop byte from button six
-	if(wiiClassy.rightShoulderPressed()){
+	//check for right Z button pressed
+
+	if(wiiClassy.rzPressed()){
 		gamepadData[2] = 1;
 		Serial.println("1");
 	}
@@ -179,11 +179,10 @@ int gamepadReceive(byte* gamepadData, WiiClassic wiiClassy){
 		Serial.println("0");
 	}
 
-	Serial.print("right Z button:");
+	Serial.print("left Z button:");
 
-	//check for right Z button pressed
-
-	if(wiiClassy.rzPressed()){
+	//check for left Z button pressed
+	if(wiiClassy.lzPressed()){
 		gamepadData[3] = 1;
 		Serial.println("1");
 	}
@@ -192,10 +191,10 @@ int gamepadReceive(byte* gamepadData, WiiClassic wiiClassy){
 		Serial.println("0");
 	}
 
-	Serial.print("left Z button:");
+	Serial.print("right shoulder:");
 
-	//check for left Z button pressed
-	if(wiiClassy.lzPressed()){
+	//copy emergency stop byte from button six
+	if(wiiClassy.rightShoulderPressed()){
 		gamepadData[4] = 1;
 		Serial.println("1");
 	}

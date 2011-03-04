@@ -34,6 +34,14 @@ void motorinit()
 
 	//debug
 	pinMode(13,OUTPUT);
+
+	// lifting motors
+	pinMode(LE1,OUTPUT);
+	pinMode(LE2,OUTPUT);
+	//default to 'off'!
+	analogWrite(LE1, 255);
+	analogWrite(LE2, 255);
+
 }
 
 //value is between -100 and 99.

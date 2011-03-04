@@ -181,7 +181,7 @@ int main()
 	            UARTsend(packet.payload.message.messagecontent, 4);
 
 	            /* Emergency Stop */
-	            if(packet.payload.message.messagecontent[2] == 1){
+	            if(packet.payload.message.messagecontent[4] == 1){
 
 	            	//stop motors
 	            	digitalWrite(4, LOW);
