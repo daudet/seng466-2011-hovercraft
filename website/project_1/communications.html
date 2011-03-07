@@ -99,10 +99,13 @@ $geshi = new GeSHi($source, 'c');
 echo $geshi->parse_code();
 ?>
 </div>
+
 <br/>
 		<p>The worst case scenario is if the start of the UART buffer contains the second preamble byte but not the first. In that case, the function is called size+2 times before a packet is correctly received.
 
 		The preamble code was a recent addition because during one branch of our project, one arduino was sending data as fast as it could to the other arduino. This would mean that while UARTreceive is running, the buffer was actively being filled. Then, when the buffer is flushed, the start of the buffer is out of sync. This wasn't an issue before because we were sending packets every 100 ms which is slow enough that the buffer was never flushed mid-packet.</p>
+		</div>
+	</div>
 
 <?php include('../includes/sidebar.php'); ?>
 
