@@ -15,10 +15,10 @@
 #define L4   9 //right
 #define DEADZONE 160
 
-#define LE1 6
-#define LE2 7
-#define LMAX1 65 //(255-LMAX)/LSTEP must be integer
-#define LMAX2 65 //(255-LMAX)/LSTEP must be integer
+#define LE1 4
+#define LE2 5
+#define LMAX1 35 //(255-LMAX)/LSTEP must be integer
+#define LMAX2 35 //(255-LMAX)/LSTEP must be integer
 #define LSTEP 10 //(255-LMAX)/LSTEP must be integer
 
 void motorinit();

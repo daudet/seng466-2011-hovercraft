@@ -51,8 +51,7 @@ int main()
 	output[2] = 67;
 	output[3] = 68;
 
-	unsigned long t;
-	byte Lflag; //1 if liftup 0 if liftdown
+	byte Lflag=0; //1 if lift 0 if lower
 	byte Lval1=255;
 	byte Lval2=255;
 
@@ -65,17 +64,17 @@ int main()
 			updateLeft((int8_t) input[1]);
 
 			if (input[2]==1)
-				Lflag=1; //lift up
+				Lflag=1; //lift
 			else if (input[3]==1)
-				Lflag=0; //lift down
+				Lflag=0; //lower
 
-			if (Lflag) { //lifting up
+			if (Lflag) { //lift
 				if (Lval1>LMAX1)
 					Lval1-=LSTEP;
 				if (Lval2>LMAX2)
 					Lval2-=LSTEP;
 			}
-			else { //lifting down
+			else { //lower
 				if (Lval1<255)
 					Lval1+=LSTEP;
 				if (Lval2<255)

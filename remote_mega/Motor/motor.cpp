@@ -37,8 +37,6 @@ void motorinit()
 	digitalWrite(E3_4, LOW);
 	digitalWrite(E1_2, LOW);
 
-	//debug
-	pinMode(13,OUTPUT);
 
 	// lifting motors
 	pinMode(LE1,OUTPUT);
