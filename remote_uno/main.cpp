@@ -193,17 +193,19 @@ int main()
 	            		delay(100);
 	            		blink_red();
 	            		delay(100);
+	            		Radio_Flush();
+	            		Serial.flush();
 	            	}
 	            }
+	            /*
+	            //create ACK packet
+	            Radio_Set_Tx_Addr(tx_addr);
+	            packet.type = ACK;
 
-	           /*
-	            if((int8_t)packet.payload.message.messagecontent[1] < 0)
-	            	blink_green();
-	        	else if ((int8_t)packet.payload.message.messagecontent[0] < 0)
-	        		blink_red ();
-	        	else
-	        		blink_orange();
-	        	*/
+	            //send an ACK packet to base station
+	            //Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
+	            Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
+				*/
 	        }
 	    }
     return 0;
@@ -212,8 +214,7 @@ int main()
 /**
 * This function is a hook into the radio's ISR.  It is called whenever the radio generates an RX_DR (received data ready) interrupt.
 */
-void radio_rxhandler(uint8_t pipenumber)
-{
+void radio_rxhandler(uint8_t pipenumber){
     // just set a flag and toggle an LED.  The flag is polled in the main function.
 	rxflag = 1;
 }

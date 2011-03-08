@@ -25,6 +25,7 @@
 
 uint8_t rx_addr[5] = { 0xE1, 0xE1, 0xE1, 0xE1, 0xE1 };
 uint8_t tx_addr[5] = { 0xE2, 0xE2, 0xE2, 0xE2, 0xE2 };
+uint8_t messageid = 0;
 
 // this has to be volatile because it's used in an ISR (radio_rxhandler).
 volatile uint8_t rxflag = 0;
@@ -41,6 +42,9 @@ radiopacket_t packet;
 
 int main()
 {
+
+	// string buffer for printing to UART
+	//char output[128];
 
 	sei();
 	init();
@@ -87,10 +91,11 @@ int main()
 		//fill the packet with data
 		memcpy(packet.payload.message.messagecontent, gamepadData, 5);
 		memcpy(packet.payload.message.address, rx_addr, 5);
-		packet.payload.message.messageid = 1;
+		packet.payload.message.messageid = ++messageid;
 
 		//send the packet to the remote station; don't wait for successful transmission
 		Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
+		//Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
 		/*
 		if (rxflag)
 		{
@@ -104,31 +109,13 @@ int main()
 				rxflag = 0;
 			}
 
-			// This station is only expecting to receive MESSAGE packets.
+			// This station is only expecting to receive ACK packets.
 			if (packet.type == ACK)
 			{
-				snprintf(output, 128, "Successfully got ACK from DEBUG for message id: %d \n\r", packet.payload.ack.messageid);
-				Serial.print(output);
-
-				//copy message into the packet
-				memcpy(packet.payload.message.messagecontent, data, 18);
-				memcpy(packet.payload.message.address, rx_addr, 5);
-
-				//send the next packet
-				packet.type = MESSAGE;
-				packet.payload.message.messageid = packet.payload.message.messageid + 1;
-
-				if(Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
-				{
-					snprintf(output, 128, "Could not send message to debug.\n\r");
-					Serial.print(output);
-				}
-				else
-				{
-					snprintf(output, 128, "Successfully sent message to debug.\n\r");
-					Serial.print(output);
-				}
+				snprintf(output, 128, "Successfully received ACK: %d from remote station\nCurrent messageid: %d", packet.payload.message.messageid, messageid);
+				Serial.println(output);
 			}
+
 		}*/
 	}
     return 0;
