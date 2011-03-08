@@ -14,6 +14,11 @@ void motorinit()
 	TCCR3B &= ~_BV(CS32);
 	TCCR3B &= ~_BV(CS31);
 
+	//lift motors
+	TCCR4B |=  _BV(CS40);
+	TCCR4B &= ~_BV(CS42);
+	TCCR4B &= ~_BV(CS41);
+
 	//set pwm outputs
 	pinMode(E3_4, OUTPUT); //E3_4 right
 	pinMode(E1_2, OUTPUT); //E1_2 left

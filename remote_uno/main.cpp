@@ -202,9 +202,18 @@ int main()
 	            Radio_Set_Tx_Addr(tx_addr);
 	            packet.type = ACK;
 
+				if (Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
+				{
+					Serial.println("Could not send ACK to base station);
+				}
+				else
+				{
+					Serial.println("Successfully sent ACK to base station");
+				}
+
 	            //send an ACK packet to base station
 	            //Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-	            Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
+	            //Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
 				*/
 	        }
 	    }
@@ -218,4 +227,3 @@ void radio_rxhandler(uint8_t pipenumber){
     // just set a flag and toggle an LED.  The flag is polled in the main function.
 	rxflag = 1;
 }
-

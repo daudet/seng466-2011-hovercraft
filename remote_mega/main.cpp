@@ -105,4 +105,3 @@ ISR(TIMER4_CAPT_vect)
   sonar[currentSonar] = ICR4/64;
   SREG = sreg;
 }
-

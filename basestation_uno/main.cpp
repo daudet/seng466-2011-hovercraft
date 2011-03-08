@@ -43,9 +43,6 @@ radiopacket_t packet;
 int main()
 {
 
-	// string buffer for printing to UART
-	//char output[128];
-
 	sei();
 	init();
 
