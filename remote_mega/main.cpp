@@ -51,6 +51,7 @@ int main()
 	output[2] = 67;
 	output[3] = 68;
 
+	unsigned int t=0;
 	byte Lflag=0; //1 if lift 0 if lower
 	byte Lval1=255;
 	byte Lval2=255;

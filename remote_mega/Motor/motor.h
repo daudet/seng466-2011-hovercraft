@@ -17,8 +17,8 @@
 
 #define LE1 4
 #define LE2 5
-#define LMAX1 35 //(255-LMAX)/LSTEP must be integer
-#define LMAX2 35 //(255-LMAX)/LSTEP must be integer
+#define LMAX1 15 //(255-LMAX)/LSTEP must be integer
+#define LMAX2 15 //(255-LMAX)/LSTEP must be integer
 #define LSTEP 10 //(255-LMAX)/LSTEP must be integer
 
 void motorinit();
