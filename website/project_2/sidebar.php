@@ -8,5 +8,9 @@
 		<a href="">Motor Dead-Zone Mapping</a><br />
 		<a href="">Wii Controller</a><br />
 		<a href="">Instrumentation</a><br />
+		<br/>
+		<br/>
+		<h2>Source Code Repository</h2>
+		<a href="http://websvn.davidaudet.ca">websvn</a><br/>
 
 </div>
