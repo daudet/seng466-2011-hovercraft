@@ -21,20 +21,30 @@
 #include "Wire/Wire.h"
 #include "wiring.h"
 #include "UART/UART.h"
+#include "TTSched/scheduler.h"
+
+//define identifiers for each tasks to be scheduled
+typedef enum _tid{
+	radioRX = 0,
+	sonarRX = 1,
+	green = 2,
+	orange = 3,
+	red = 4,
+
+}TASK_IDS;
 
 uint8_t rx_addr[5] = { 0xE2, 0xE2, 0xE2, 0xE2, 0xE2 };
 uint8_t tx_addr[5] = { 0xE1, 0xE1, 0xE1, 0xE1, 0xE1 };
 
 // this has to be volatile because it's used in an ISR (radio_rxhandler).
 volatile uint8_t rxflag = 0;
+radiopacket_t packet;
 
 extern "C" void __cxa_pure_virtual()
 {
     cli();
     for(;;);
 }
-
-radiopacket_t packet;
 
 void blinkm()
 {
@@ -64,6 +74,7 @@ void blink_green(){
 	Wire.send(0xff);
 	Wire.send(0x00);
 	Wire.endTransmission();
+	delay(20);
 
 }
 
@@ -75,6 +86,7 @@ void blink_red(){
 	Wire.send(0x00);
 	Wire.send(0x00);
 	Wire.endTransmission();
+	delay(20);
 }
 
 void blink_orange(){
@@ -85,6 +97,112 @@ void blink_orange(){
 	Wire.send(0x66);
 	Wire.send(0x00);
 	Wire.endTransmission();
+	delay(20);
+}
+
+/*	this function does nothing, but could be
+	used to accomplish something useful with any
+	idle time
+*/
+void idle(uint32_t idle_period){
+
+	blink_orange();
+}
+
+void radio_receive(){
+	char output[128];
+	if (rxflag){
+		if (Radio_Receive(&packet) != RADIO_RX_MORE_PACKETS)
+		{
+			// if there are no more packets on the radio, clear the receive flag;
+			// otherwise, we want to handle the next packet on the next loop iteration.
+			rxflag = 0;
+			Radio_Flush();
+		}
+
+		// This station is only expecting to receive MESSAGE packets.
+		if (packet.type != MESSAGE)
+		{
+			//light up the LED
+			blink_red();
+			snprintf(output, 128, "Error: wrong packet type (type %d).\n\r", packet.type);
+			Serial.print(output);
+			return;
+		}
+
+		// Set the transmit address to the one specified in the message packet.
+		//Radio_Set_Tx_Addr(packet.payload.message.address);
+
+		// Print out the message, along with the message ID and sender address.
+		snprintf(output, 128, "Message ID %d from 0x%.2X%.2X%.2X%.2X%.2X INFO-> right: %.2X left: %.2X emergency: %.2X\n\r",
+				packet.payload.message.messageid,
+				packet.payload.message.address[0],
+				packet.payload.message.address[1],
+				packet.payload.message.address[2],
+				packet.payload.message.address[3],
+				packet.payload.message.address[4],
+				packet.payload.message.messagecontent[0],
+				packet.payload.message.messagecontent[1],
+				packet.payload.message.messagecontent[2]);
+		Serial.print(output);
+
+		UARTsend(packet.payload.message.messagecontent, 4);
+
+		//Emergency Stop
+		if(packet.payload.message.messagecontent[4] == 1){
+
+			//stop motors
+			digitalWrite(4, LOW);
+
+			for(;;){
+
+				digitalWrite(5, LOW);
+				blink_orange();
+				delay(100);
+				blink_red();
+				delay(100);
+				Radio_Flush();
+				Serial.flush();
+			}
+		}
+		/*
+		//create ACK packet
+		Radio_Set_Tx_Addr(tx_addr);
+		packet.type = ACK;
+
+		if (Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
+		{
+			Serial.println("Could not send ACK to base station");
+		}
+		else
+		{
+			Serial.println("Successfully sent ACK to base station");
+		}
+
+		//send an ACK packet to base station
+		//Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
+		//Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
+		*/
+	}
+}
+//read the sonar data from UART
+void sonar_receive(){
+
+	byte data[4];
+	int8_t sonar_diff;
+
+	if(UARTreceive(data, 4)){
+		sonar_diff = (int8_t)data[0] - (int8_t)data [1];
+
+		if(sonar_diff < 0){
+			blink_red();
+		}
+		else if(sonar_diff == 0){
+			blink_orange();
+		}
+		else
+			blink_green();
+	}
 }
 
 int main()
@@ -94,6 +212,7 @@ int main()
     sei();
     init();
 
+    //setup the BlinkM LED
     blinkm();
 
     //output used for transistor
@@ -119,104 +238,32 @@ int main()
     // configure radio transceiver settings.
     Radio_Configure(RADIO_2MBPS, RADIO_HIGHEST_POWER);
 
+    //initialize the scheduler
+    Scheduler_Init();
+
+    //setup the tasks to be run
+    Scheduler_StartTask(radioRX, 0, 50, radio_receive);
+    Scheduler_StartTask(red, 0, 200, blink_red);
+    Scheduler_StartTask(green, 0, 200, blink_green);
+
+
     // enable interrupts
     sei();
 
     // print a message to UART to indicate that the program has started up
     snprintf(output, 128, "Starting Remote Station\n\r");
-    //Serial.print(output);
-    byte data[4];
-    int8_t sonar_diff;
+    Serial.print(output);
 
-	for (;;)
-	    {
-			if(UARTreceive(data, 4)){
-				sonar_diff = (int8_t)data[0] - (int8_t)data [1];
 
-				if(sonar_diff < 0){
-					blink_red();
-				}
-				else if(sonar_diff == 0){
-					blink_orange();
-				}
-				else
-					blink_green();
-			}
-
-	        if (rxflag)
-	        {
-	            if (Radio_Receive(&packet) != RADIO_RX_MORE_PACKETS)
-	            {
-	                // if there are no more packets on the radio, clear the receive flag;
-	                // otherwise, we want to handle the next packet on the next loop iteration.
-	                rxflag = 0;
-	            }
-
-	            // This station is only expecting to receive MESSAGE packets.
-	            if (packet.type != MESSAGE)
-	            {
-	            	//light up the LED
-	            	blink_red();
-	                snprintf(output, 128, "Error: wrong packet type (type %d).\n\r", packet.type);
-	                Serial.print(output);
-	                continue;
-	            }
-
-	            // Set the transmit address to the one specified in the message packet.
-	            //Radio_Set_Tx_Addr(packet.payload.message.address);
-
-	            // Print out the message, along with the message ID and sender address.
-	            snprintf(output, 128, "Message ID %d from 0x%.2X%.2X%.2X%.2X%.2X INFO-> right: %.2X left: %.2X emergency: %.2X\n\r",
-	                    packet.payload.message.messageid,
-	                    packet.payload.message.address[0],
-	                    packet.payload.message.address[1],
-	                    packet.payload.message.address[2],
-	                    packet.payload.message.address[3],
-	                    packet.payload.message.address[4],
-	                    packet.payload.message.messagecontent[0],
-	                    packet.payload.message.messagecontent[1],
-	                    packet.payload.message.messagecontent[2]);
-	            //Serial.print(output);
-
-	            UARTsend(packet.payload.message.messagecontent, 4);
-
-	            /* Emergency Stop */
-	            if(packet.payload.message.messagecontent[4] == 1){
-
-	            	//stop motors
-	            	digitalWrite(4, LOW);
-
-	            	for(;;){
-
-	            		digitalWrite(5, LOW);
-	            		blink_orange();
-	            		delay(100);
-	            		blink_red();
-	            		delay(100);
-	            		Radio_Flush();
-	            		Serial.flush();
-	            	}
-	            }
-	            /*
-	            //create ACK packet
-	            Radio_Set_Tx_Addr(tx_addr);
-	            packet.type = ACK;
-
-				if (Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
-				{
-					Serial.println("Could not send ACK to base station);
-				}
-				else
-				{
-					Serial.println("Successfully sent ACK to base station");
-				}
-
-	            //send an ACK packet to base station
-	            //Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-	            //Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
-				*/
-	        }
-	    }
+    for(;;){
+    	//run through the task list and run tasks as required
+    	uint32_t idle_period = Scheduler_Dispatch();
+    	    if (idle_period)
+    	    {
+    	    	idle(idle_period);
+    	    }
+    }
+    for(;;);
     return 0;
 }
 
