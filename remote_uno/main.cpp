@@ -23,6 +23,10 @@
 #include "UART/UART.h"
 #include "TTSched/scheduler.h"
 
+//function prototypes
+void radio_transmit();
+void radio_receive();
+
 //define identifiers for each tasks to be scheduled
 typedef enum _tid{
 	radioRX = 0,
@@ -30,6 +34,7 @@ typedef enum _tid{
 	green = 2,
 	orange = 3,
 	red = 4,
+	radioTX = 5
 
 }TASK_IDS;
 
@@ -106,7 +111,8 @@ void blink_orange(){
 */
 void idle(uint32_t idle_period){
 
-	blink_orange();
+	delay(idle_period);
+	//radio_transmit();
 }
 
 void radio_receive(){
@@ -144,7 +150,7 @@ void radio_receive(){
 				packet.payload.message.messagecontent[0],
 				packet.payload.message.messagecontent[1],
 				packet.payload.message.messagecontent[2]);
-		Serial.print(output);
+		//Serial.print(output);
 
 		UARTsend(packet.payload.message.messagecontent, 4);
 
@@ -165,26 +171,27 @@ void radio_receive(){
 				Serial.flush();
 			}
 		}
-		/*
-		//create ACK packet
-		Radio_Set_Tx_Addr(tx_addr);
-		packet.type = ACK;
 
-		if (Radio_Transmit(&packet, RADIO_WAIT_FOR_TX) == RADIO_TX_MAX_RT)
-		{
-			Serial.println("Could not send ACK to base station");
-		}
-		else
-		{
-			Serial.println("Successfully sent ACK to base station");
-		}
-
-		//send an ACK packet to base station
-		//Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-		//Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
-		*/
 	}
 }
+
+void radio_transmit(){
+
+		Serial.println("Attempting to send debug message");
+		//create debug packet
+		Radio_Set_Tx_Addr(tx_addr);
+		packet.type = MESSAGE;
+
+		memcpy(packet.payload.message.messagecontent, "debug", 5);
+
+		if (Radio_Transmit(&packet, RADIO_RETURN_ON_TX) == RADIO_TX_MAX_RT){
+			Serial.println("Could not send debug message to base station");
+		}
+		else{
+			Serial.println("Successfully sent debug message to base station");
+		}
+}
+
 //read the sonar data from UART
 void sonar_receive(){
 
@@ -243,8 +250,10 @@ int main()
 
     //setup the tasks to be run
     Scheduler_StartTask(radioRX, 0, 50, radio_receive);
-    Scheduler_StartTask(red, 0, 200, blink_red);
-    Scheduler_StartTask(green, 0, 200, blink_green);
+    Scheduler_StartTask(radioTX, 0, 50, radio_transmit);
+    //Scheduler_StartTask(red, 0, 800, blink_red);
+    //Scheduler_StartTask(green, 0, 400, blink_green);
+    //Scheduler_StartTask(orange, 0, 800, blink_orange);
 
 
     // enable interrupts

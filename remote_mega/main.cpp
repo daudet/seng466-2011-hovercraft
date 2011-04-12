@@ -21,6 +21,7 @@ extern "C" void __cxa_pure_virtual()
 unsigned int sonar[NUM_SONARS];
 char sonarState = SONAR_POWERUP;
 char currentSonar;
+int t;
 
 void blink()
 {
@@ -85,8 +86,7 @@ int main()
 			analogWrite(LE2,Lval2); //lift motor 2
 		}
 
-		if (millis() - t > 100)
-		{
+		if (millis() - t > 100){
 			UARTsend(output,4);
 			t = millis();
 		}
