@@ -45,6 +45,15 @@ uint8_t tx_addr[5] = { 0xE1, 0xE1, 0xE1, 0xE1, 0xE1 };
 volatile uint8_t rxflag = 0;
 radiopacket_t packet;
 
+//flags used to set state of FSM
+uint8_t emergFlag = 0;
+uint8_t autoFlag = 0;
+
+// string buffer for printing to UART
+char output[128];
+
+unsigned long t1 = 0;
+
 extern "C" void __cxa_pure_virtual()
 {
     cli();
@@ -91,7 +100,7 @@ void blink_red(){
 	Wire.send(0x00);
 	Wire.send(0x00);
 	Wire.endTransmission();
-	delay(20);
+	//delay(20);
 }
 
 void blink_orange(){
@@ -102,7 +111,28 @@ void blink_orange(){
 	Wire.send(0x66);
 	Wire.send(0x00);
 	Wire.endTransmission();
-	delay(20);
+	//delay(20);
+}
+void blink_emergencyFlash(){
+	Wire.beginTransmission(0x09);
+	Wire.send('o');
+	Wire.send('p');
+	Wire.send(0x18);
+	Wire.send(0x00);
+	Wire.send(0x00);
+	Wire.send('f');
+	Wire.send(25);
+	Wire.endTransmission();
+}
+
+void blink_stop(){
+	Wire.beginTransmission(0x09);
+	Wire.send('o');
+	Wire.send('c');
+	Wire.send(0x00);
+	Wire.send(0x00);
+	Wire.send(0x00);
+	Wire.endTransmission();
 }
 
 /*	this function does nothing, but could be
@@ -117,6 +147,7 @@ void idle(uint32_t idle_period){
 
 void radio_receive(){
 	char output[128];
+
 	if (rxflag){
 		if (Radio_Receive(&packet) != RADIO_RX_MORE_PACKETS)
 		{
@@ -136,42 +167,42 @@ void radio_receive(){
 			return;
 		}
 
-		// Set the transmit address to the one specified in the message packet.
-		//Radio_Set_Tx_Addr(packet.payload.message.address);
 
-		// Print out the message, along with the message ID and sender address.
-		snprintf(output, 128, "Message ID %d from 0x%.2X%.2X%.2X%.2X%.2X INFO-> right: %.2X left: %.2X emergency: %.2X\n\r",
-				packet.payload.message.messageid,
-				packet.payload.message.address[0],
-				packet.payload.message.address[1],
-				packet.payload.message.address[2],
-				packet.payload.message.address[3],
-				packet.payload.message.address[4],
-				packet.payload.message.messagecontent[0],
-				packet.payload.message.messagecontent[1],
-				packet.payload.message.messagecontent[2]);
-		//Serial.print(output);
-
-		UARTsend(packet.payload.message.messagecontent, 4);
-
-		//Emergency Stop
-		if(packet.payload.message.messagecontent[4] == 1){
-
-			//stop motors
-			digitalWrite(4, LOW);
-
-			for(;;){
-
-				digitalWrite(5, LOW);
-				blink_orange();
-				delay(100);
-				blink_red();
-				delay(100);
-				Radio_Flush();
-				Serial.flush();
-			}
+		Serial.println(millis()-t1);
+		//If emergency stop button pressed toggle emergFlag
+		if((packet.payload.message.messagecontent[4] == 1) && ((millis() - t1) > 1000.0)){
+			emergFlag = (emergFlag + 1) % 2;
+			//keep track of time last toggle
+			t1 = millis();
 		}
 
+		if(emergFlag){
+			//stop motors
+			//digitalWrite(4, LOW);
+			digitalWrite(5, LOW);
+			//blink_emergencyFlash();
+			blink_red();
+			delay(20);
+			blink_orange();
+		}
+		else{
+			digitalWrite(5, HIGH);
+			blink_stop();
+		}
+		Radio_Flush();
+		Serial.flush();
+
+		//If emergency stop button pressed toggle emergFlag
+		if(packet.payload.message.messagecontent[3] == 1)
+			autoFlag = (autoFlag + 1) % 2;
+
+		if(autoFlag){
+			//read sonar data and calculate values to send to MEGA
+		}
+		else{
+			//pass on gamepad data to MEGA
+			UARTsend(packet.payload.message.messagecontent, 4);
+		}
 	}
 }
 
@@ -182,7 +213,8 @@ void radio_transmit(){
 		Radio_Set_Tx_Addr(tx_addr);
 		packet.type = MESSAGE;
 
-		memcpy(packet.payload.message.messagecontent, "debug", 5);
+	    snprintf(output, 128, "emergFlag=%d autoFlag=%d", emergFlag, autoFlag);
+		memcpy(packet.payload.message.messagecontent, output, 23);
 
 		if (Radio_Transmit(&packet, RADIO_RETURN_ON_TX) == RADIO_TX_MAX_RT){
 			Serial.println("Could not send debug message to base station");
@@ -214,8 +246,7 @@ void sonar_receive(){
 
 int main()
 {
-    // string buffer for printing to UART
-    char output[128];
+
     sei();
     init();
 
@@ -267,10 +298,9 @@ int main()
     for(;;){
     	//run through the task list and run tasks as required
     	uint32_t idle_period = Scheduler_Dispatch();
-    	    if (idle_period)
-    	    {
-    	    	idle(idle_period);
-    	    }
+
+    	if (idle_period)
+    	    idle(idle_period);
     }
     for(;;);
     return 0;
