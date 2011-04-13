@@ -52,7 +52,7 @@ extern "C" void __cxa_pure_virtual()
 }
 
 radiopacket_t packet;
-byte gamepadData[5];
+byte gamepadData[6];
 
 /*	this function does nothing, but could be
 	used to accomplish something useful with any
@@ -66,20 +66,24 @@ void idle(uint32_t idle_period){
 
 /*
  * gamepadData is structured as follows:
- * gamepadData[0] = right analog joystick value from -127 --> 127
- * gamepadData[1] = left analog joystick value from -127 --> 127
- * gamepadData[2] = lifting motor actuator (right Z button) either 0 or 1
- * gamepadData[3] = auto toggle button (left Z button) either 0 or 1
- * gamepadData[4] = emergency stop button (right shoulder button) either 0 or 1
+ * gamepadData[0] = right Y analog joystick value from -127 --> 127
+ * gamepadData[1] = right X analog joystick value from -127 --> 127
+ * gamepadData[2] = left Y analog joystick value from -127 --> 127
+ * gamepadData[3] = lifting motor actuator (right Z button) either 0 or 1
+ * gamepadData[4] = auto toggle button (left Z button) either 0 or 1
+ * gamepadData[5] = emergency stop button (right shoulder button) either 0 or 1
  */
 void gamepad_receive(){
 
 	wiiClassy.update();
 
 	//copy right analog data byte into message_content
-	Serial.print("right stick:");
+	Serial.print("right stick Y:");
 	gamepadData[0] = (byte)(constrain((map(wiiClassy.rightStickY(), 1, 28, -127, 127) - 4), -127, 128));
 	Serial.println((int8_t)gamepadData[0]);
+
+	Serial.print("right stick X:");
+	Serial.println((int8_t)map((constrain((wiiClassy.rightStickX() - 10), -31, 31)), -7, 19, -127, 127));
 
 	//copy left analog data byte into message_content
 	Serial.print("left stick:");
