@@ -98,8 +98,7 @@ int main()
 }
 
 //our sonar ping has been received - save the TCNT
-ISR(TIMER4_CAPT_vect)
-{
+ISR(TIMER4_CAPT_vect){
   char sreg = SREG;
   sonar[currentSonar] = ICR4/64;
   SREG = sreg;

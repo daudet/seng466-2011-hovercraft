@@ -170,7 +170,7 @@ void radio_receive(){
 
 		Serial.println(millis()-t1);
 		//If emergency stop button pressed toggle emergFlag
-		if((packet.payload.message.messagecontent[4] == 1) && ((millis() - t1) > 1000.0)){
+		if((packet.payload.message.messagecontent[5] == 1) && ((millis() - t1) > 1000.0)){
 			emergFlag = (emergFlag + 1) % 2;
 			//keep track of time last toggle
 			t1 = millis();
@@ -178,7 +178,6 @@ void radio_receive(){
 
 		if(emergFlag){
 			//stop motors
-			//digitalWrite(4, LOW);
 			digitalWrite(5, LOW);
 			//blink_emergencyFlash();
 			blink_red();
@@ -192,8 +191,8 @@ void radio_receive(){
 		Radio_Flush();
 		Serial.flush();
 
-		//If emergency stop button pressed toggle emergFlag
-		if(packet.payload.message.messagecontent[3] == 1)
+		//If auto button pressed toggle autoFlag
+		if(packet.payload.message.messagecontent[4] == 1)
 			autoFlag = (autoFlag + 1) % 2;
 
 		if(autoFlag){
@@ -201,7 +200,9 @@ void radio_receive(){
 		}
 		else{
 			//pass on gamepad data to MEGA
-			UARTsend(packet.payload.message.messagecontent, 4);
+			if(!emergFlag){
+				UARTsend(packet.payload.message.messagecontent, 6);
+			}
 		}
 	}
 }
@@ -213,8 +214,8 @@ void radio_transmit(){
 		Radio_Set_Tx_Addr(tx_addr);
 		packet.type = MESSAGE;
 
-	    snprintf(output, 128, "emergFlag=%d autoFlag=%d", emergFlag, autoFlag);
-		memcpy(packet.payload.message.messagecontent, output, 23);
+		//debug message
+	    snprintf(output, 128, "%d;%d", (int8_t)packet.payload.message.messagecontent[0], (int8_t)packet.payload.message.messagecontent[1]);
 
 		if (Radio_Transmit(&packet, RADIO_RETURN_ON_TX) == RADIO_TX_MAX_RT){
 			Serial.println("Could not send debug message to base station");
@@ -282,10 +283,6 @@ int main()
     //setup the tasks to be run
     Scheduler_StartTask(radioRX, 0, 50, radio_receive);
     Scheduler_StartTask(radioTX, 0, 50, radio_transmit);
-    //Scheduler_StartTask(red, 0, 800, blink_red);
-    //Scheduler_StartTask(green, 0, 400, blink_green);
-    //Scheduler_StartTask(orange, 0, 800, blink_orange);
-
 
     // enable interrupts
     sei();

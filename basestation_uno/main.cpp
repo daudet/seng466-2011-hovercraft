@@ -24,6 +24,9 @@
 #include "Wire/Wire.h"
 #include "TTSched/scheduler.h"
 
+//enable or disable debug messages
+bool debug = false;
+
 //define identifiers for each tasks to be scheduled
 typedef enum _tid{
 	radioRX = 0,
@@ -52,14 +55,13 @@ extern "C" void __cxa_pure_virtual()
 }
 
 radiopacket_t packet;
-byte gamepadData[6];
+byte gamepadData[7];
 
 /*	this function does nothing, but could be
 	used to accomplish something useful with any
 	idle time
 */
 void idle(uint32_t idle_period){
-	//delay(idle_period);
 	//use idle time to receive debug pkts
 	radio_receive();
 }
@@ -75,58 +77,61 @@ void idle(uint32_t idle_period){
  */
 void gamepad_receive(){
 
+	//poll the gamepad for change in state since last call
 	wiiClassy.update();
 
-	//copy right analog data byte into message_content
-	Serial.print("right stick Y:");
+	//copy right Y analog data byte into message_content
 	gamepadData[0] = (byte)(constrain((map(wiiClassy.rightStickY(), 1, 28, -127, 127) - 4), -127, 128));
-	Serial.println((int8_t)gamepadData[0]);
 
-	Serial.print("right stick X:");
-	Serial.println((int8_t)map((constrain((wiiClassy.rightStickX() - 10), -31, 31)), -7, 19, -127, 127));
+	//copy right X analog data byte into message_content
+	gamepadData[1] = (byte)(map((constrain((wiiClassy.rightStickX() - 10), -31, 31)), -7, 19, -127, 127));
 
-	//copy left analog data byte into message_content
-	Serial.print("left stick:");
-	gamepadData[1] = (byte)(constrain(map(wiiClassy.leftStickY(), 5, 59, -127, 127), -127, 127));
-	Serial.println((int8_t)gamepadData[1]);
-
-	Serial.print("right Z button:");
+	//copy left Y analog data byte into message_content
+	gamepadData[2] = (byte)(constrain(map(wiiClassy.leftStickY(), 5, 59, -127, 127), -127, 127));
 
 	//check for right Z button pressed
-
 	if(wiiClassy.rzPressed()){
-		gamepadData[2] = 1;
-		Serial.println("1");
-	}
-	else{
-		gamepadData[2] = 0;
-		Serial.println("0");
-	}
-
-	Serial.print("left Z button:");
-
-	//check for left Z button pressed
-	if(wiiClassy.lzPressed()){
 		gamepadData[3] = 1;
-		Serial.println("1");
 	}
 	else{
 		gamepadData[3] = 0;
-		Serial.println("0");
 	}
 
-	Serial.print("right shoulder:");
-
-	//copy emergency stop byte from button six
-	if(wiiClassy.rightShoulderPressed()){
+	//check for left Z button pressed
+	if(wiiClassy.lzPressed()){
 		gamepadData[4] = 1;
-		Serial.println("1");
 	}
 	else{
 		gamepadData[4] = 0;
-		Serial.println("0");
 	}
 
+	//copy emergency stop byte from button six
+	if(wiiClassy.rightShoulderPressed()){
+		gamepadData[5] = 1;
+	}
+	else{
+		gamepadData[5] = 0;
+	}
+
+	if(debug){
+	Serial.print("right stick Y:");
+	Serial.println((int8_t)gamepadData[0]);
+
+	Serial.print("right stick X:");
+	Serial.println((int8_t)gamepadData[1]);
+
+	Serial.print("left stick Y:");
+	Serial.println((int8_t)gamepadData[2]);
+
+	Serial.print("right Z button:");
+	Serial.println((int8_t)gamepadData[3]);
+
+	Serial.print("left Z button:");
+	Serial.println((int8_t)gamepadData[4]);
+
+	Serial.print("right shoulder:");
+	Serial.println((int8_t)gamepadData[5]);
+	}
 }
 
 void radio_transmit(){
@@ -134,13 +139,12 @@ void radio_transmit(){
 	packet.type = MESSAGE;
 
 	//fill the packet with data
-	memcpy(packet.payload.message.messagecontent, gamepadData, 5);
-	memcpy(packet.payload.message.address, rx_addr, 5);
+	memcpy(packet.payload.message.address, rx_addr, 6);
 	packet.payload.message.messageid = ++messageid;
+	memcpy(packet.payload.message.messagecontent, gamepadData, sizeof(gamepadData));
 
 	//send the packet to the remote station; don't wait for successful transmission
 	Radio_Transmit(&packet, RADIO_RETURN_ON_TX);
-	//Radio_Transmit(&packet, RADIO_WAIT_FOR_TX);
 
 }
 
@@ -159,11 +163,8 @@ void radio_receive(){
 		}
 
 		// This station is only expecting to receive DEBUG packets.
-		if (packet.type == MESSAGE){
+		if (packet.type == MESSAGE)
 			snprintf(output, 128, "Debug message: %s", packet.payload.message.messagecontent);
-			Serial.println(output);
-		}
-
 	}
 }
 
@@ -189,9 +190,11 @@ int main(){
 	wiiClassy.begin();
 	wiiClassy.update();
 
-    // print a message to UART to indicate that the program has started up
-    snprintf(output, 128, "Starting Base Station\n\r");
-    Serial.print(output);
+    if(debug){
+    	//print a message to UART to indicate that the program has started up
+    	snprintf(output, 128, "Starting Base Station\n\r");
+    	Serial.print(output);
+    }
 
     //power on nrf24L01
     pinMode(7,OUTPUT);
