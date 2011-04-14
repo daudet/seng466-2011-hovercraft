@@ -9,82 +9,100 @@
 
 void motorinit()
 {
-	// set PWM frequency to 32khz
+	// set PWM frequency to 32khz (lift motors)
 	TCCR3B |=  _BV(CS30);
 	TCCR3B &= ~_BV(CS32);
 	TCCR3B &= ~_BV(CS31);
-
-	//lift motors
+	//movement motors
 	TCCR4B |=  _BV(CS40);
 	TCCR4B &= ~_BV(CS42);
 	TCCR4B &= ~_BV(CS41);
 
 	//set pwm outputs
-	pinMode(E3_4, OUTPUT); //E3_4 right
-	pinMode(E1_2, OUTPUT); //E1_2 left
+	pinMode(rightE, OUTPUT); //right
+	pinMode(leftE, OUTPUT); //left
+	pinMode(strafeE, OUTPUT); //strafe
 
 	//Motor directions
-	pinMode(L3, OUTPUT); //L3 right
-	pinMode(L4, OUTPUT); //L4 right
-	pinMode(L1, OUTPUT); //L1 left
-	pinMode(L2, OUTPUT); //L2 left
+	pinMode(right1, OUTPUT);
+	pinMode(right2, OUTPUT);
+	pinMode(left1, OUTPUT);
+	pinMode(left2, OUTPUT);
+	pinMode(strafe1, OUTPUT);
+	pinMode(strafe2, OUTPUT);
 
 	//default values (off)
-	digitalWrite(L3, LOW);
-	digitalWrite(L4, HIGH);
-	digitalWrite(L1, LOW);
-	digitalWrite(L2, HIGH);
-	digitalWrite(E3_4, LOW);
-	digitalWrite(E1_2, LOW);
+	digitalWrite(right1, LOW);
+	digitalWrite(right2, HIGH);
+	digitalWrite(left1, LOW);
+	digitalWrite(left2, HIGH);
+	digitalWrite(strafe1, LOW);
+	digitalWrite(strafe2, HIGH);
+	digitalWrite(rightE, LOW);
+	digitalWrite(leftE, LOW);
+	digitalWrite(strafeE, LOW);
 
 
 	// lifting motors
-	pinMode(LE1,OUTPUT);
-	pinMode(LE2,OUTPUT);
+	pinMode(backE,OUTPUT);
+	pinMode(frontE,OUTPUT);
+
 	//default to 'off'!
-	analogWrite(LE1, 255);
-	analogWrite(LE2, 255);
+	analogWrite(backE, 0);
+	analogWrite(frontE, 0);
 
 }
 
-//value is between -100 and 99.
+//value is between -127 and 127.
 void updateRight(int8_t value)
 {
 	if(value < 0){ //UP
-		digitalWrite(L3, LOW);
-		digitalWrite(L4, HIGH);
-		analogWrite(E3_4, map(abs(value),1,128,DEADZONE,255));
-		digitalWrite(13,HIGH);
+		digitalWrite(right1, LOW);
+		digitalWrite(right2, HIGH);
+		analogWrite(rightE, map(abs(value),1,127,DEADZONE,255));
 	}
 	else if(value > 0){ //DOWN
-		digitalWrite(L3, HIGH);
-		digitalWrite(L4, LOW);
-		analogWrite(E3_4, map(abs(value),1,128,DEADZONE,255));
-		digitalWrite(13,LOW);
+		digitalWrite(right1, HIGH);
+		digitalWrite(right2, LOW);
+		analogWrite(rightE, map(abs(value),1,127,DEADZONE,255));
 	}
 	else{
-		digitalWrite(E3_4, LOW);
-		digitalWrite(13,LOW);
+		digitalWrite(rightE, LOW);
 	}
 }
 
-//value is between -100 and 99.
+//value is between -127 and 127.
 void updateLeft(int8_t value)
 {
 	if(value < 0){ //UP
-		digitalWrite(L1, LOW);
-		digitalWrite(L2, HIGH);
-		analogWrite(E1_2,  map(abs(value),1,128,DEADZONE,255));
-		digitalWrite(13,HIGH);
+		digitalWrite(left1, LOW);
+		digitalWrite(left2, HIGH);
+		analogWrite(leftE,  map(abs(value),1,127,DEADZONE,255));
 	}
 	else if(value > 0){ //DOWN
-		digitalWrite(L1, HIGH);
-		digitalWrite(L2, LOW);
-		analogWrite(E1_2,  map(abs(value),1,128,DEADZONE,255));
-		digitalWrite(13,LOW);
+		digitalWrite(left1, HIGH);
+		digitalWrite(left2, LOW);
+		analogWrite(leftE,  map(abs(value),1,127,DEADZONE,255));
 	}
 	else{
-		digitalWrite(E1_2, LOW);
-		digitalWrite(13,LOW);
+		digitalWrite(leftE, LOW);
+	}
+}
+
+//value is between -127 and 127.
+void updateStrafe(int8_t value)
+{
+	if(value < 0){ //UP
+		digitalWrite(strafe1, LOW);
+		digitalWrite(strafe2, HIGH);
+		analogWrite(strafeE,  map(abs(value),1,127,DEADZONE,255));
+	}
+	else if(value > 0){ //DOWN
+		digitalWrite(strafe1, HIGH);
+		digitalWrite(strafe2, LOW);
+		analogWrite(strafeE,  map(abs(value),1,127,DEADZONE,255));
+	}
+	else{
+		digitalWrite(strafeE, LOW);
 	}
 }

@@ -45,7 +45,7 @@ int main()
 	UARTinit();
 	sonarInit();
 
-    byte input[4];
+    byte input[6];
     byte output[4];
 	output[0] = 65;
 	output[1] = 66;
@@ -53,48 +53,47 @@ int main()
 	output[3] = 68;
 
 	unsigned int t=0;
-	byte Lflag=0; //1 if lift 0 if lower
-	byte Lval1=255;
-	byte Lval2=255;
+	byte Lflag=0; //1 if lift 0 if kill
+	byte frontVal=0;
+	byte backVal=0;
 
 
 	for(;;)
 	{
-		if(UARTreceive(input,4))
+		if(UARTreceive(input,6))
 		{
 			updateRight((int8_t) input[0]);
-			updateLeft((int8_t) input[1]);
+			updateLeft((int8_t) input[2]);
+			updateStrafe((int8_t) input[1]);
 
-			if (input[2]==1)
-				Lflag=1; //lift
-			else if (input[3]==1)
-				Lflag=0; //lower
+			if (input[3]==1)
+				Lflag=(Lflag+1)%2;
 
-			if (Lflag) { //lift
-				if (Lval1>LMAX1)
-					Lval1-=LSTEP;
-				if (Lval2>LMAX2)
-					Lval2-=LSTEP;
-			}
-			else { //lower
-				if (Lval1<255)
-					Lval1+=LSTEP;
-				if (Lval2<255)
-					Lval2+=LSTEP;
-			}
-			analogWrite(LE1,Lval1); //lift motor 1
-			analogWrite(LE2,Lval2); //lift motor 2
 		}
 
 		if (millis() - t > 100){
-			UARTsend(output,4);
 			t = millis();
+			UARTsend(output,4);
+
+			if (Lflag) { //lift
+				if (frontVal<frontMax)
+					frontVal+=liftStep;
+				if (backVal<backMax)
+					backVal+=liftStep;
+			}
+			else { //lower
+				frontVal=0;
+				backVal=0;
+			}
+
+			analogWrite(backE,backVal); //lift back motor
+			analogWrite(frontE,frontVal); //lift front motor
+
 		}
 		sonarUpdate();
 		output[0] = (byte) (sonar[0]/16);
 		output[1] = (byte) (sonar[1]/16);
 	}
-
     return 0;
 }
 

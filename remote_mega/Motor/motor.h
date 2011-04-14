@@ -7,22 +7,28 @@
 
 #include "../Core/WProgram.h"
 
-#define E1_2 3 //left
-#define E3_4 2 //right
-#define L1   10 //left
-#define L2   11 //left
-#define L3   8 //right
-#define L4   9 //right
+//movement motors are on timer4
+#define leftE	6  	//left
+#define left1   37 	//left
+#define left2   36 	//left
+#define rightE  7 	//right
+#define right1  35 	//right
+#define right2  34 	//right
+#define strafeE 8	//strafe
+#define strafe1 23  //strafe
+#define strafe2 22  //strafe
 #define DEADZONE 160
 
-#define LE1 4
-#define LE2 5
-#define LMAX1 15 //(255-LMAX)/LSTEP must be integer
-#define LMAX2 15 //(255-LMAX)/LSTEP must be integer
-#define LSTEP 10 //(255-LMAX)/LSTEP must be integer
+//lift motors are on timer3
+#define backE 2 //back lift
+#define frontE 3 //front lift
+#define frontMax 255 //(frontMax/liftStep) must be integer
+#define backMax 255 //(backMax/liftStep) must be integer
+#define liftStep 15
 
 void motorinit();
 void updateRight(int8_t);
 void updateLeft(int8_t);
+void updateStrafe(int8_t);
 
 
