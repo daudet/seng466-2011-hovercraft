@@ -10,7 +10,7 @@
 
 void UARTinit()
 {
-	Serial.begin(BAUD);
+	Serial1.begin(BAUD);
 }
 
 void initbuffer(byte* buffer, byte size)
@@ -22,13 +22,13 @@ void initbuffer(byte* buffer, byte size)
 
 int UARTreceive(byte* buffer, byte size)
 {
-	if (Serial.available() >= (size+2)){
-		if (Serial.read()==PRE1){
-			if (Serial.read()==PRE2){
+	if (Serial1.available() >= (size+2)){
+		if (Serial1.read()==PRE1){
+			if (Serial1.read()==PRE2){
 				byte i;
 				for (i = 0; i < size ; i++)
-					buffer[i] = Serial.read();
-				Serial.flush();
+					buffer[i] = Serial1.read();
+				Serial1.flush();
 				return 1;
 			}
 		}
@@ -39,7 +39,7 @@ int UARTreceive(byte* buffer, byte size)
 void UARTsend(byte* buffer, byte size)
 {
 	byte PRE[2] = {PRE1,PRE2};
-	Serial.write(PRE,2);
-	Serial.write(buffer, size);
+	Serial1.write(PRE,2);
+	Serial1.write(buffer, size);
 }
 

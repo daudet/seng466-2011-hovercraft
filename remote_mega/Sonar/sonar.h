@@ -6,7 +6,7 @@
  */
 
 #define NUM_SONARS       2
-#define SONAR_PIN        22
+#define SONAR_PIN        30
 
 #define SONAR_POWERUP    0
 #define SONAR_CALIBRATE  1

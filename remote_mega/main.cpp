@@ -21,7 +21,7 @@ extern "C" void __cxa_pure_virtual()
 unsigned int sonar[NUM_SONARS];
 char sonarState = SONAR_POWERUP;
 char currentSonar;
-int t;
+//int t;
 
 void blink()
 {
@@ -40,10 +40,17 @@ int main()
 {
 
     init();
-    //blink();
+
 	motorinit();
+	updateRight(70);
+	updateLeft(-70);
+	updateStrafe(70);
+
+
 	UARTinit();
-	sonarInit();
+	//blink();
+	//sonarInit();
+
 
     byte input[6];
     byte output[4];
@@ -56,6 +63,7 @@ int main()
 	byte Lflag=0; //1 if lift 0 if kill
 	byte frontVal=0;
 	byte backVal=0;
+
 
 
 	for(;;)
@@ -90,16 +98,25 @@ int main()
 			analogWrite(frontE,frontVal); //lift front motor
 
 		}
-		sonarUpdate();
-		output[0] = (byte) (sonar[0]/16);
-		output[1] = (byte) (sonar[1]/16);
+		//sonarUpdate();
+		//output[0] = (byte) (sonar[0]/16);
+		//output[1] = (byte) (sonar[1]/16);
 	}
     return 0;
 }
 
 //our sonar ping has been received - save the TCNT
+<<<<<<< .mine
+//ISR(TIMER4_CAPT_vect)
+//{
+//  char sreg = SREG;
+//  sonar[currentSonar] = ICR4/64;
+//  SREG = sreg;
+//}
+=======
 ISR(TIMER4_CAPT_vect){
   char sreg = SREG;
   sonar[currentSonar] = ICR4/64;
   SREG = sreg;
 }
+>>>>>>> .r142
