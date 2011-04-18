@@ -42,17 +42,12 @@ int main()
     init();
 
 	motorinit();
-	updateRight(70);
-	updateLeft(-70);
-	updateStrafe(70);
-
-
 	UARTinit();
 	//blink();
 	//sonarInit();
 
 
-    byte input[6];
+    byte input[8];
     byte output[4];
 	output[0] = 65;
 	output[1] = 66;
@@ -63,12 +58,14 @@ int main()
 	byte Lflag=0; //1 if lift 0 if kill
 	byte frontVal=0;
 	byte backVal=0;
+	byte Upflag=0;
+	byte Downflag=0;
 
 
 
 	for(;;)
 	{
-		if(UARTreceive(input,6))
+		if(UARTreceive(input,8))
 		{
 			updateRight((int8_t) input[0]);
 			updateLeft((int8_t) input[2]);
@@ -76,6 +73,28 @@ int main()
 
 			if (input[3]==1)
 				Lflag=(Lflag+1)%2;
+			if (input[6]==1)
+				Upflag=1;
+			if (input[7]==1)
+				Downflag=1;
+
+			if (Upflag==1) {
+				Upflag=0;
+				if (frontVal<frontMax)
+					frontVal+=liftStep;
+				if (backVal<backMax)
+					backVal+=liftStep;
+			}
+			if (Downflag==1) {
+				Downflag=0;
+				if (frontVal>0)
+					frontVal-=liftStep;
+				if (backVal>0)
+					backVal-=liftStep;
+			}
+
+			analogWrite(backE,backVal); //lift back motor
+			analogWrite(frontE,frontVal); //lift front motor
 
 		}
 
@@ -83,19 +102,18 @@ int main()
 			t = millis();
 			UARTsend(output,4);
 
-			if (Lflag) { //lift
-				if (frontVal<frontMax)
-					frontVal+=liftStep;
-				if (backVal<backMax)
-					backVal+=liftStep;
-			}
-			else { //lower
-				frontVal=0;
-				backVal=0;
-			}
+//			if (Lflag) { //lift
+//				if (frontVal<frontMax)
+//					frontVal+=liftStep;
+//				if (backVal<backMax)
+//					backVal+=liftStep;
+//			}
+//			else { //lower
+//				frontVal=0;
+//				backVal=0;
+//			}
 
-			analogWrite(backE,backVal); //lift back motor
-			analogWrite(frontE,frontVal); //lift front motor
+
 
 		}
 		//sonarUpdate();
@@ -106,17 +124,10 @@ int main()
 }
 
 //our sonar ping has been received - save the TCNT
-<<<<<<< .mine
+
 //ISR(TIMER4_CAPT_vect)
 //{
 //  char sreg = SREG;
 //  sonar[currentSonar] = ICR4/64;
 //  SREG = sreg;
 //}
-=======
-ISR(TIMER4_CAPT_vect){
-  char sreg = SREG;
-  sonar[currentSonar] = ICR4/64;
-  SREG = sreg;
-}
->>>>>>> .r142
