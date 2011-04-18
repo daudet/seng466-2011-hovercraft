@@ -23,12 +23,13 @@ char sonarState = SONAR_POWERUP;
 char currentSonar;
 //int t;
 
+void liftRampUp(int, int);
+
 void blink()
 {
 	pinMode(13, OUTPUT);
 
-	for(;;)
-	{
+	for(;;){
 	    digitalWrite(13,HIGH);
 	    delay(500);
 	    digitalWrite(13,LOW);
@@ -36,8 +37,18 @@ void blink()
 	}
 }
 
-int main()
-{
+void liftRampUp(int* frontVal, int* backVal){
+	unsigned int t2 = 0;
+	while((*frontVal < frontMax) && (*backVal < backMax)){
+		if (millis() - t2 > 500){
+			t2 = millis();
+			*frontVal += liftStep;
+			*backVal += liftStep;
+		}
+	}
+}
+
+int main(){
 
     init();
 
@@ -46,6 +57,7 @@ int main()
 	//blink();
 	//sonarInit();
 
+	motorinit();
 
     byte input[8];
     byte output[4];
@@ -54,13 +66,15 @@ int main()
 	output[2] = 67;
 	output[3] = 68;
 
-	unsigned int t=0;
-	byte Lflag=0; //1 if lift 0 if kill
-	byte frontVal=0;
-	byte backVal=0;
+	unsigned int t1 = 0;
+	//set default values for lift motors
+	byte frontVal = 0;
+	byte backVal = 0;
+	byte Lflag = 0; //1 if lift 0 if kill
 	byte Upflag=0;
 	byte Downflag=0;
 
+	for(;;){
 
 
 	for(;;)
@@ -80,10 +94,24 @@ int main()
 
 			if (Upflag==1) {
 				Upflag=0;
-				if (frontVal<frontMax)
-					frontVal+=liftStep;
-				if (backVal<backMax)
-					backVal+=liftStep;
+				//if the motors are stopped, ramp up to the max PWM values
+				if((frontVal == 0) && (backVal == 0)){
+					liftRampUp(&frontVal, &backVal);
+				}
+
+				//increase lift power if '+' button pressed
+				if (input[6] == 1){
+					if((frontVal < frontMax) && (backVal < backMax))
+						frontVal += liftStep;
+						backVal += liftStep;
+				}
+
+				//decrement lift power if '-' button pressed
+				if(input[7] == 1){
+					if((frontVal > frontMin) && (backVal > backMin))
+					frontVal -= liftStep;
+					backVal -= liftStep;
+				}
 			}
 			if (Downflag==1) {
 				Downflag=0;
@@ -120,7 +148,7 @@ int main()
 		//output[0] = (byte) (sonar[0]/16);
 		//output[1] = (byte) (sonar[1]/16);
 	}
-    return 0;
+	return 0;
 }
 
 //our sonar ping has been received - save the TCNT

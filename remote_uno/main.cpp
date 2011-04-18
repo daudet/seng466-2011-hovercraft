@@ -167,25 +167,33 @@ void radio_receive(){
 			return;
 		}
 
+		//Serial.print("EmergStop: ");
+		//Serial.println((int8_t)packet.payload.message.messagecontent[5]);
 
-		Serial.println(millis()-t1);
 		//If emergency stop button pressed toggle emergFlag
-		if((packet.payload.message.messagecontent[5] == 1) && ((millis() - t1) > 1000.0)){
+		if(((int8_t)packet.payload.message.messagecontent[5] == 1) && ((millis() - t1) > 1000.0)){
+		//if(packet.payload.message.messagecontent[5] == 1){
 			emergFlag = (emergFlag + 1) % 2;
 			//keep track of time last toggle
 			t1 = millis();
 		}
 
 		if(emergFlag){
-			//stop motors
+			//turn off relay
 			digitalWrite(5, LOW);
-			//blink_emergencyFlash();
+			//reset MEGA
+			digitalWrite(4, LOW);
+
 			blink_red();
 			delay(20);
 			blink_orange();
 		}
 		else{
+			//turn on relay
 			digitalWrite(5, HIGH);
+			//turn MEGA back on
+			digitalWrite(4, HIGH);
+
 			blink_stop();
 		}
 		Radio_Flush();
@@ -201,7 +209,7 @@ void radio_receive(){
 		else{
 			//pass on gamepad data to MEGA
 			if(!emergFlag){
-				UARTsend(packet.payload.message.messagecontent, 6);
+				UARTsend(packet.payload.message.messagecontent, 8);
 			}
 		}
 	}
@@ -209,19 +217,20 @@ void radio_receive(){
 
 void radio_transmit(){
 
-		Serial.println("Attempting to send debug message");
+		//Serial.println("Attempting to send debug message");
 		//create debug packet
 		Radio_Set_Tx_Addr(tx_addr);
 		packet.type = MESSAGE;
 
 		//debug message
-	    snprintf(output, 128, "%d;%d", (int8_t)packet.payload.message.messagecontent[0], (int8_t)packet.payload.message.messagecontent[1]);
+	    snprintf(output, 128, "%d;%d;%d;%d;%d;%d;%d;%d", (int8_t)packet.payload.message.messagecontent[0], (int8_t)packet.payload.message.messagecontent[1], (int8_t)packet.payload.message.messagecontent[2], (int8_t)packet.payload.message.messagecontent[3], (int8_t)packet.payload.message.messagecontent[4], (int8_t)packet.payload.message.messagecontent[5], (int8_t)packet.payload.message.messagecontent[6],(int8_t)packet.payload.message.messagecontent[7]);
+	    memcpy(packet.payload.message.messagecontent, output, sizeof(output));
 
 		if (Radio_Transmit(&packet, RADIO_RETURN_ON_TX) == RADIO_TX_MAX_RT){
-			Serial.println("Could not send debug message to base station");
+			//Serial.println("Could not send debug message to base station");
 		}
 		else{
-			Serial.println("Successfully sent debug message to base station");
+			//Serial.println("Successfully sent debug message to base station");
 		}
 }
 
@@ -258,6 +267,10 @@ int main()
     pinMode(5, OUTPUT);
     digitalWrite(5, HIGH);
 
+    //output for the MEGA RST pin
+    pinMode(4, OUTPUT);
+    digitalWrite(4, HIGH);
+
     //power on nrf24L01
     pinMode(7,OUTPUT);
     digitalWrite(7,HIGH);
@@ -281,15 +294,15 @@ int main()
     Scheduler_Init();
 
     //setup the tasks to be run
-    Scheduler_StartTask(radioRX, 0, 50, radio_receive);
-    Scheduler_StartTask(radioTX, 0, 50, radio_transmit);
+    Scheduler_StartTask(radioRX, 0, 100, radio_receive);
+    //Scheduler_StartTask(radioTX, 0, 500, radio_transmit);
 
     // enable interrupts
     sei();
 
     // print a message to UART to indicate that the program has started up
     snprintf(output, 128, "Starting Remote Station\n\r");
-    Serial.print(output);
+    //Serial.print(output);
 
 
     for(;;){

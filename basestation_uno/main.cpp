@@ -55,7 +55,7 @@ extern "C" void __cxa_pure_virtual()
 }
 
 radiopacket_t packet;
-byte gamepadData[7];
+byte gamepadData[8];
 
 /*	this function does nothing, but could be
 	used to accomplish something useful with any
@@ -74,6 +74,8 @@ void idle(uint32_t idle_period){
  * gamepadData[3] = lifting motor actuator (right Z button) either 0 or 1
  * gamepadData[4] = auto toggle button (left Z button) either 0 or 1
  * gamepadData[5] = emergency stop button (right shoulder button) either 0 or 1
+ * gamepadData[6] = increase lift value
+ * gamepadData[7] = decrease lift value
  */
 void gamepad_receive(){
 
@@ -90,47 +92,58 @@ void gamepad_receive(){
 	gamepadData[2] = (byte)(constrain(map(wiiClassy.leftStickY(), 5, 59, -127, 127), -127, 127));
 
 	//check for right Z button pressed
-	if(wiiClassy.rzPressed()){
+	if(wiiClassy.rzPressed())
 		gamepadData[3] = 1;
-	}
-	else{
+	else
 		gamepadData[3] = 0;
-	}
 
 	//check for left Z button pressed
-	if(wiiClassy.lzPressed()){
+	if(wiiClassy.lzPressed())
 		gamepadData[4] = 1;
-	}
-	else{
+	else
 		gamepadData[4] = 0;
-	}
 
 	//copy emergency stop byte from button six
-	if(wiiClassy.rightShoulderPressed()){
+	if(wiiClassy.rightShoulderPressed())
 		gamepadData[5] = 1;
-	}
-	else{
+	else
 		gamepadData[5] = 0;
-	}
+
+	//store info for lift motors
+	if(wiiClassy.startPressed())
+		gamepadData[6] = 1;
+	else
+		gamepadData[6] = 0;
+
+	if(wiiClassy.selectPressed())
+		gamepadData[7] = 1;
+	else
+		gamepadData[7] = 0;
 
 	if(debug){
-	Serial.print("right stick Y:");
-	Serial.println((int8_t)gamepadData[0]);
+		Serial.print("right stick Y:");
+		Serial.println((int8_t)gamepadData[0]);
 
-	Serial.print("right stick X:");
-	Serial.println((int8_t)gamepadData[1]);
+		Serial.print("right stick X:");
+		Serial.println((int8_t)gamepadData[1]);
 
-	Serial.print("left stick Y:");
-	Serial.println((int8_t)gamepadData[2]);
+		Serial.print("left stick Y:");
+		Serial.println((int8_t)gamepadData[2]);
 
-	Serial.print("right Z button:");
-	Serial.println((int8_t)gamepadData[3]);
+		Serial.print("right Z button:");
+		Serial.println((int8_t)gamepadData[3]);
 
-	Serial.print("left Z button:");
-	Serial.println((int8_t)gamepadData[4]);
+		Serial.print("left Z button:");
+		Serial.println((int8_t)gamepadData[4]);
 
-	Serial.print("right shoulder:");
-	Serial.println((int8_t)gamepadData[5]);
+		Serial.print("right shoulder:");
+		Serial.println((int8_t)gamepadData[5]);
+
+		Serial.print("start button:");
+		Serial.println((int8_t)gamepadData[6]);
+
+		Serial.print("select button:");
+		Serial.println((int8_t)gamepadData[7]);
 	}
 }
 
@@ -165,6 +178,7 @@ void radio_receive(){
 		// This station is only expecting to receive DEBUG packets.
 		if (packet.type == MESSAGE)
 			snprintf(output, 128, "Debug message: %s", packet.payload.message.messagecontent);
+			Serial.println(output);
 	}
 }
 
@@ -216,8 +230,8 @@ int main(){
     Scheduler_Init();
 
     //setup the tasks to be run
-    Scheduler_StartTask(radioTX, 0, 150, radio_transmit);
-    Scheduler_StartTask(gamepadRX, 0, 100, gamepad_receive);
+    Scheduler_StartTask(radioTX, 0, 100, radio_transmit);
+    Scheduler_StartTask(gamepadRX, 0, 50, gamepad_receive);
 
     // enable interrupts
     sei();
