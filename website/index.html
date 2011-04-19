@@ -30,28 +30,6 @@ Released for free under a Creative Commons Attribution 2.5 License
 			<p>The content will be mostly technical and will document problems and issues that we have faced to help future classes with similar projects.</p>
 
 			<img src="images/blinkM_flash.jpg" alt="picture of Arduino hardware"></img>
-	<div class="code">	
-		<?php
-		include_once 'includes/geshi.php';
-		$source = '/* This is a test of the code filter
-		*/	
-		#include<stdio.h>
-					
-		int main(int argc, char** argv){
-			int i;
-			for(i = 0; i < 10; i++){
-				printf("Hello World!\n");
-			}
-			return 0;
-		}';
-
-			$geshi = new GeSHi($source, 'C');
-			$geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
-		
-			echo $geshi->parse_code();
-		?>
-	</div>
-
 		</div>
 	</div>
 
