@@ -1,16 +1,10 @@
 <div id="sidebar">
 
 		<h2>Project 2</h2>
-		<a href="project2.html">Overview</a><br />
-		<a href="platform.html">Platform Design</a><br />
-		<a href="skirt.html">Skirt Design</a><br />
-		<a href="">Lifting Motor Drivers</a><br />
-		<a href="">Motor Dead-Zone Mapping</a><br />
-		<a href="">Wii Controller</a><br />
-		<a href="">Instrumentation</a><br />
+		<a href="project2.html">Report</a><br />
 		<br/>
 		<br/>
 		<h2>Source Code Repository</h2>
-		<a href="http://websvn.davidaudet.ca">websvn</a><br/>
+		<a href="http://code.google.com/p/seng466-2011-hovercraft/">google code</a><br/>
 
 </div>
