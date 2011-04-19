@@ -55,50 +55,8 @@ Released for free under a Creative Commons Attribution 2.5 License
 
 			It is asychronous, which means some handshaking must occur to ensure data reliability. This was designed and implemented specifically for this project. Basically, two bytes are added to every packet as a form of handshaking. In retrospect, these bytes should have been at the start and front of a packet, but are instead at the beginning of each packet.</p>
 
-<div class=code>
-<?php
-include_once '../includes/geshi.php';
-$source='int UARTreceive(byte* buffer, byte size)
-{
-	if (Serial.available() >= (size+2)){
-		if (Serial.read()==PRE1){
-			if (Serial.read()==PRE2){
-				byte i;
-				for (i = 0; i < size ; i++)
-					buffer[i] = Serial.read();
-				Serial.flush();
-				return 1;
-			}
-		}
-	}
-	return 0;
-}
-
-void UARTsend(byte* buffer, byte size)
-{
-	byte PRE[2] = {PRE1,PRE2};
-	Serial.write(PRE,2);
-	Serial.write(buffer, size);
-}';
-$geshi = new GeSHi($source, 'c');
-echo $geshi->parse_code();
-?>
-</div>
 <br/>
 		<p>The receiveing function is the most interesting. It looks for a packet of a certain size passed in the function call, and checks to see if the UART buffer contains at least that size, plus two for the preamble handshake. Then it proceeds to check if the first two bytes in the buffer are equal to the defined preamble. If they are, then it reads the expected size of the packet and stores it, then flushes the buffer. This will ensure we get fairly new data everytime. If the preamble check fails, then it will take the failed byte out of the buffer, and return 0. This function is utilized below in the main program loop below.</p>
-
-<div class=code>
-<?php
-include_once '../includes/geshi.php';
-$source='if(UARTreceive(input,4))
-{
-  updateRight((int8_t) input[0]);
-  updateLeft((int8_t) input[1]);
-}';
-$geshi = new GeSHi($source, 'c');
-echo $geshi->parse_code();
-?>
-</div>
 
 <br/>
 		<p>The worst case scenario is if the start of the UART buffer contains the second preamble byte but not the first. In that case, the function is called size+2 times before a packet is correctly received.

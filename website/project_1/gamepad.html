@@ -43,20 +43,6 @@ Released for free under a Creative Commons Attribution 2.5 License
 			<h2>Reading Serial Data Sent Via UART</h2>
 			<p>Now that the attached Arduino was receiving the data from the python script, the data now had to be read and interpretted by the Arduino. To do this Neil has put some basic code on his site.</p>
 
-<div class=code>
-<?php
-include_once '../includes/geshi.php';
-$source='
-//wait until a full packet has been buffered
-while (Serial.available() < 20);
-
-//fill the buffer with the 20 bytes received
-	for (i = 0; i < 20; i++)
-		data[i] = Serial.read();';
-$geshi = new GeSHi($source, 'c');
-echo $geshi->parse_code();
-?>
-</div>
 			<br/>
 			<p>To test what input we were reading from the serial connection we used the BlinkM LED to light different colours depending on the input from the joystick. When we first ran this test we were getting some strange output. The LED would light up, for both the right and left analog joysticks when we were checking two separate bytes of data to determine which colour to light up. After a lot of digging and some monitoring using a FTDI chip that Neil gave us, we figured out that we needed to flush the serial right after we received the correct amount of data. We modified the sample code to read the 18 bytes (of useful data) and then flush the serial. After these modifications, the LED was illuminating correctly and as we had anticipated.</p>
 
